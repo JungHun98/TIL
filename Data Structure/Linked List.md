@@ -2,7 +2,7 @@
 
 - 데이터와 다음 노트를 가리키는 포인터를 가지고 있는 각 노드가 한줄로 연결되어 있는 방식으로 데이터를 저장하는 자료구조.
 
-  ![리스트 이미지](https://cdn.codingworldnews.com/news/photo/202104/img_3379_1.jpg)
+  ![리스트 이미지](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJruyjHRl2NmuUC6iVcaiXqkB4gnDD2rxgXw&usqp=CAU)
 
 ## 연결 리스트 기능(함수)
 
