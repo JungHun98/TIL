@@ -111,3 +111,20 @@ h1 {
 
      - `태그:선택속성`으로 선택하면 특수한 상태의 태그를 스타일링 할 수 있다. 선택속성은 다양하다.
      - ex) hover 태그위에 마우스가 올라가있을 때 색이 검정색으로 적용
+
+   - tag.class : html 파일에 존재하는 모든 tag에서 class의 값이 "class"인 것들을 선택한다.
+   - selector1, selector2 ... : 여러개의 선택자를 선택한다.
+   - selector \* : 선택자의 모든 자식들을 선택한다.
+   - selector:nth-child(n) : 선택자의 n번째 자식을 선택한다.
+   - selector1:not(selector2) : selector1에서 selector2가 아닌 모든 것을 선택한다.
+   - 같은 선택자가 선택되어 서로 다른 CSS속성을 입력한다면 우선순위에 따라 속성이 적용된다.
+     1. HTML style 속성
+     2. id 선택자
+     3. class 선택자
+     4. tag 선택자
+     5. `!important`라는 css 속성을 추가 할 경우 우선순위를 무시하고 추가한 선택자에 작성된 css가 적용된다.
+
+## CSS 상속
+
+- 부모 태그의 css속성은 모든 자식 tag에 상속된다.
+- 하지만 모든 태그가 상속받을 수 있는 것은 아니다.
