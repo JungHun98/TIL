@@ -10,7 +10,7 @@
 
 - 예시1 ) Sequential Search vs. Binary Search
 
-  ![](/img/%EA%B2%80%EC%83%89%EB%B9%84%EA%B5%90.JPG)
+  ![](./img/검색비교.JPG)
 
   - 검색 알고리즘 최악의 경우를 비교 횟수로 나타낸 것이다.
   - 선형 검색과 이진 검색은 배열의 크기가 작을 때는 크게 차이가 나질 않는다.
@@ -18,7 +18,7 @@
 
 - 예시2 ) Recursive vs. Iterative Fibonacci Algorithm
 
-  ![](/img/%EC%9E%AC%EA%B7%80%EB%B0%98%EB%B3%B5%EB%B9%84%EA%B5%90.JPG)
+  ![](/img/재귀반복비교.JPG)
 
   - 피보나치 수열을 반복문으로 구현했을 때, 재귀 함수로 구현했을 때 수행 시간을 비교한 것이다.
   - 검색 알고리즘과 마찬가지로 피보나치 수열의 길이가 길어질수록 수행시간의 차이가 극명하게 난다.
