@@ -48,3 +48,31 @@
     3. Average Case Analysis : 연산 횟수 평균인 경우
 
 - 알고리즘의 분석 기법을 사용해 개발 할 때 효율적인 알고리즘을 선별할 수 있다.
+
+# Order
+
+- 효율적인 알고리즘을 찾기 위한 분석 방법이다.
+- 알고리즘의 복잡도 함수가 주어졌을 때, 가장 높은 차수의 항이 가장 중요하다. 함수의 차수가 알고리즘의 효율성을 판단하는 지표가 된다.
+
+## Big O
+
+- 표현법 : O(f(n))
+- f(n)의 차수보다 작거나 같은 함수들의 집합
+- O(f(n)) = { g(n) | <sup>∃</sup> real c>0,<sup>∃</sup> integer N ≥0 s.t.
+  g(n) ≤ c × f(n), <sup>∀</sup>n ≥ N }
+- O(n<sup>2</sup>)에 해당하는 함수들은 n, n<sup>2</sup>, n<sup>2</sup> + 10 등이 있다.
+
+## Omega(Ω)
+
+- 표현법 : Ω(f(n))
+- f(n)의 차수보다 크거나 같은 함수들의 집합
+- Ω(f(n)) = { g(n) | <sup>∃</sup> real c>0,<sup>∃</sup> integer N ≥0 s.t.
+  g(n) ≥ c × f(n), <sup>∀</sup>n ≥ N }
+- Ω(n<sup>2</sup>)에 해당하는 함수들은 n<sup>2</sup>, n<sup>3</sup> + 10 등이 있다.
+
+## Theta(θ)
+
+- 표현법 : θ(f(n))
+- f(n)의 차수와 같은 함수들의 집합.
+- θ(f(n))= O(f(n)) ∩ Ω(f(n))
+- θ(n<sup>2</sup>)에 해당하는 함수들은 n<sup>2</sup>, n<sup>2</sup> + 10 등이 있다.
