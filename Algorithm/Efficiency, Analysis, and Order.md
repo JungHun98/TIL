@@ -74,5 +74,13 @@
 
 - 표현법 : θ(f(n))
 - f(n)의 차수와 같은 함수들의 집합.
-- θ(f(n))= O(f(n)) ∩ Ω(f(n))
+- θ(f(n)) = O(f(n)) ∩ Ω(f(n))
+- θ(n<sup>2</sup>)에 해당하는 함수들은 n<sup>2</sup>, n<sup>2</sup> + 10 등이 있다.
+
+## Samll o(o)
+
+- 표현법 : o(f(n))
+- f(n)의 차수보다 작은 함수들의 집합.
+- o(f(n)) = { g(n) | <sup>∀</sup>real c>0,<sup>∃</sup> integer N ≥0 s.t.
+  g(n) ≤ c × f(n), <sup>∀</sup>n ≥ N }
 - θ(n<sup>2</sup>)에 해당하는 함수들은 n<sup>2</sup>, n<sup>2</sup> + 10 등이 있다.
