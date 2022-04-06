@@ -65,3 +65,99 @@
 - IPC
   - 메시지 시스템
   - 공유 메모리
+
+# Process Scheduling
+
+- CPU에 어떤 프로세스를 선택해서 실행할 것인가를 선택하는 작업.
+- MultiProcessing을 위한 작업이다.
+
+## CPU-I/O Burst Cycle
+
+- 프로세스는 CPU burst(CPU가 명령어를 실행하는 구간)와 I/O burst(I/O가 완료될때 까지 기다리는 구간)이 번갈아가며 실행된다.
+- I/O bound process: CPU burst가 짧고, I/O burst가 긴 프로세스
+- CPU bound process: CPU burst가 길고, I/O burst가 짧은 프로세스
+
+## Process Scheduler
+
+- Process scheduler는 <u>ready queue</u>에 대기중인 프로세스 중에서 실행 할 프로세스를 선택한다.
+
+- 프로세스 스케쥴링이 일어나는 상황
+
+  1. running 상태 프로세스가 waiting 상태로 전환 될 때(I/O or event).
+  2. running 상태 프로세스가 time slice를 넘겨서 실행된 경우.
+  3. 프로세스가 종료되었을 때.
+
+- Non-preemptive scheduling
+  - 프로세스가 자발적으로 waiting상태가 종료하지 않는다면 프로세스 종료시까지 프로세스간의 전환이 일어나지 않도록 하는 스케쥴링
+- Preemptive scheduling
+
+  - 강제적으로 실행되고 있는 프로세스를 정지시키는 스케쥴링.
+
+- Dispatcher는 선택된 프로세스를 CPU에 올리는 역할을 한다.
+
+  1. switching context
+  2. CPU에 새롭게 올린 프로세스가 종료된 시점부터 다시 시작하도록 한다.
+  3. process를 실행하도록 user모드로 전환한다.
+
+## Scheduling Criteria(기준)
+
+- 어떤 스케쥴링 알고리즘을 쓸것인가에 대한 기준
+
+1. CPU utilization: CPU를 가능한 바쁘게 유지해야한다.
+2. Throughput: 주어진 시간안에 가능한 많은 프로세스를 실행해야한다.
+3. Turnaround time: 프로세스가 실행되고 끝날때 까지의 시간을 최소화해야한다.
+4. Waiting time: 프로세스가 ready queue에서 대기하고 있는 시간을 최소화해야한다.(waiting queue에 있는 프로세스는 해당되지 않음)
+5. Response time: 어떤 event를 받아서 결과를 출력하는데 걸리는 시간을 최소화해야한다.
+
+## Scheduling Algorithms
+
+- ready queue에 있는 프로세스를 선택해서 CPU에 올리는 알고리즘.
+
+1. First-Come, First-Served (FCFS, FIFO) Scheduling
+
+   - 먼저 ready queue에 들어온 프로세스부터 CPU에 올린다.
+     ![](./img/fifo.JPG)
+     ![](./img/fifo1.JPG)
+
+2. Shortest-Job-First (SJF) Scheduling
+
+   - CPU burst time이 짧은 프로세스부터 실행시킨다.
+   - 하지만 이 알고리즘은 다음 프로세스의 CPU burst time을 알아낼 방법이 없이 때문에 구현이 어렵다.
+     ![](./img/sjf.JPG)
+
+3. Priority Scheduling
+
+   - 각 프로세스마다 우선순위를 부여해 우선순위가 높은 프로세스 먼저 실행한다.
+   - SJF알고리즘도 Priority Scheduling에 포함된다.
+   - Preemptive방식
+     - 만약 현재 실행중인 프로세스보다 높은 우선순위의 프로세스가 생성되었다면 현재 실행중인 프로세스를 ready queue로 보내고 새로운 프로세스를 실행한다.
+       ![](./img/1.JPG)
+   - non-preemptive방식 - 현재 실행중인 프로세스보다 높은 우선순위의 프로세스가 생성되어도 현재 실행중인 프로세스를 먼저 실행한다.
+     ![](./img/2.JPG)
+
+     ![](./img/3.JPG)
+
+   - Priority Scheduling은 계속해서 우선순위가 높은 프로세가 생성되면 낮은 우선순위의 프로세스 실행이 지연되는 문제가 발생할 수 있다.(starvation)
+   - Aging: 오래동안 실행되지 않은 프로세스의 우선순위를 높여서 지연문제를 해결할 수 있는 기법.
+
+4. Round Robin (RR) Scheduling
+
+   - FIFO + time quantum or time slice
+   - 기본적으로 동작은 FIFO와 같지만 프로세스가 지정된 시간만큼 CPU를 소비하게 되면 ready queue의 가장 뒤로 이동한다.
+   - 프로세스를 강제적으로 종료시키는 점에서 preemptive방식이다.
+     ![](./img/4.JPG)
+   - time quantum이 너무 낮으면 Context Switich가 너무 많이 발생하여 부하가 생길 수 있다. 따라서 10~100msec정도의 time quantum을 사용한다.
+
+5. Multilevel Queue Scheduling
+
+   - 서로 다른 스케줄링 알고리즘을 적용한 Ready queue를 사용한다.
+   - 대표적으로 Priority-based multilevel queue scheduling이 있다.
+     - Priority Scheduling, Round Robin Scheduling을 사용하는 모델이다.
+       ![](./img/5.JPG)
+     - 우선순위가 높은 Ready queue에 있는 프로세스들 부터 Round Robin Scheduling으로 실행이 된다.
+     - 우선순위를 이용한 스케줄링 기법을 사용하므로 이 알고리즘 역시 starvation을 고려해야 한다.
+
+6. Multilevel Feedback-Queue Scheduling
+   - Multilevel Queue Scheduling의 starvation문제를 해결하고자 고안된 알고리즘이다.
+   - CPU를 적게 점유한 프로세스를 우선순위기 높은 Ready queue로 이동시킨다.
+     ![](./img/6.JPG)
