@@ -1,3 +1,54 @@
+## Arithmetic Operations
+
+- `add a, b, c` # a = b + c
+- 산술명령은 모두 위 형태와 같은 형태이다.
+- 이런식으로 단순하게 표준화하면, 구현이 간단해지고 저렴한 비용으로 높은 성능을 낼 수 있다.
+- Example
+
+  ```
+  f = (g + h) - (i + j)
+
+  =>
+  add t0, g, h
+  add t1, i, j
+  sub f, t0, t1
+  ```
+
+## Register Operands
+
+- 산술 명령은 register
+  operands를 사용하게 된다.
+- Mips는 32bit의 레지스터를 사용하며, 32-bit의 데이터를 "word"로 부른다.
+  - $t0 ... $t9 : 임시저장
+  - $s0 ... $s7 : 변수 저장
+- 작을 수록 빠르다.
+- Example
+
+  ```
+  f = (g + h) - (i + j);
+  // f, …, j in $s0, …, $s4
+
+  add $t0, $s1, $s2
+  add $t1, $s3, $s4
+  sub $s0, $t1, $t2
+  ```
+
+## Memory Operands
+
+- 데이터를 메모리에 저장하고 가져오는(load)연산이다.
+- 메모리는 byte addressed이다.
+- Example
+
+  ```
+  A[12] = h + A[8];
+  //  h in $s2, base address of A in $s3
+
+  lw $t0, 32($s3) # load
+  add $s0, $s2, $t0
+  sw $s0, 48($s3) # store
+  // 배열은 한칸을 이동할 때 4byt씩 이동하므로 (배열 index * 4 + 배열의 주소)가 그 요소의 주소를 나타낸다.
+  ```
+
 ## Register vs. Memory
 
 - 레지스터는 메모리보다 액세스 속도가 빠르다.
@@ -151,7 +202,7 @@
 
 ## Register Usage
 
-- $a0 – $a3: arguments (reg’s 4 – 7)
+- $a0 – $a3: arguments (reg’s 4 – 7) (만약 인자가 4개를 넘어가면 스택에 저장한다.)
 - $v0, $v1: result values (reg’s 2 and 3)
 - $t0 – $t9: 임시변수
   - callee측이 덮어쓸 수 있다.
@@ -167,7 +218,7 @@
 - `jal ProcedureLabel` : jump and link
   - $ra에 기재된 다음 지시사항의 주소로 점프함
 - `jr $ra` : jump register
-  - $ra를 프로그램 카운터레 복사
+  - $ra를 프로그램 카운터에 복사
   - 계산된 점프에도 사용가능(switch문)
 
 ## Local Data on the Stack
@@ -181,3 +232,5 @@
 - Dynamic data: heap(동적 메모리)
 - Stack: 자동 저장
   ![](./img/memoryylaout.JPG)
+
+## Byte/Halfword Operations
