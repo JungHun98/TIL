@@ -18,16 +18,14 @@
 
 - 단방향 연결리스트(위 이미지와 같은 형태)
 - 양방향 연결리스트
+- 자신의 앞쪽 노드와 뒤쪽 노드를 연결하는 포인터를 가진 연결리스트
 
-  - 자신의 앞쪽 노드와 뒤쪽 노드를 연결하는 포인터를 가진 연결리스트
-
-    ![양방향 리스트 이미지](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSH2IlJDgDORL_clXhsBTLE5REEhTZLkb9ILg&usqp=CAU)
+  ![양방향 리스트 이미지](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSH2IlJDgDORL_clXhsBTLE5REEhTZLkb9ILg&usqp=CAU)
 
 - 원형 연결리스트
+- 단방향 연결리스트에서 가장 끝 노드가 가장 앞 노드를 연결하는 연결리스트
 
-  - 단방향 연결리스트에서 가장 끝 노드가 가장 앞 노드를 연결하는 연결리스트
-
-    ![원형 리스트 이미지](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAk41KkHPVyTo39cTwNrz0Q3bojkJtf3Ad_g&usqp=CAU)
+  ![원형 리스트 이미지](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAk41KkHPVyTo39cTwNrz0Q3bojkJtf3Ad_g&usqp=CAU)
 
 ## 연결 리스트의 장점과 단점
 
