@@ -66,3 +66,65 @@
   - 반으로 나눈 배열들을 정렬할 때와 merge함수에서 모두 최악의 경우로 발생하는 경우.
   - W(n)=W(h)+W(m)+ W(h, m)<br>
     = W(h)+W(m)+h+m-1<br>
+
+3. Quick Sort
+
+- MergeSort와 비슷한점: 하나의 배열을 두개로 나누어서 각각 재귀적으로 정렬한다.
+
+- MergeSort와 다른점: 배열을 세 부분으로 나눈다. (배열1, pivot item, 배열2)
+  pivot item을 기준으로 왼쪽 배열에서는 pivot item보다 작은 값, 오른쪽 배열에는 큰 값을 위치시키고 정렬 후 결합한다.
+  ![](./img/quick.JPG)
+- QuickSort Algorithm
+
+  - input: low, high (subarray의 index중 가장 작은 값과 큰 값)
+  - output: 정렬된 배열
+
+  ```
+  public static void quickSort(index low, index high){
+    index pivotPoint;
+
+    if(high > low){
+      pivotPoint = partition(low, high); // 분할 지점 구하기
+      quickSort(low, pivotPoint - 1);
+      quickSort(pivotPoint + 1, high);
+    }
+  }
+  ```
+
+- Partition Algorithm
+
+  - pivot item의 위치를 반환한다.
+  - 정렬할 배열내의 요소들을 하나씩 비교하며 위치를 변경해 partition을 수행한다.
+
+  ```
+  public static index partition(index low, index high){
+    index i, j, pivotPoint;
+    keyType pivotItem = S[low];
+    j = low;
+
+    for(i = low + 1; i <= high; i++){
+      if(S[i] < pivotItem){
+        swap S[i], S[++j];
+      }
+    }
+
+  pivotPoint = j;
+  swap S[low], S[pivotPoint];
+  return pivotPoint;
+  }
+  ```
+
+- Partition Time Complexity
+  - 기본 연산: S[i]와 pivotItem의 비교연산
+  - Input Size: m = high - low + 1, subarray의 요소 개수
+  - T(m) = m - 1
+- Worst Case Time Complexity QuickSort
+  - 기본 연산: partition에서 S[i]와 pivotItem의 비교연산
+  - Input Size: n, 배열의 크기
+  - QuickSort의 최악의 경우는 이미 정렬된 배열을 정렬하는 것이다.
+    ![](./img/1.JPG)
+  - n의 배열일 경우 시간 복잡도: T(n) = n - 1 + T(0) + T(n - 1)
+    - n - 1: partition time
+    - T(0): 왼쪽 배열 정렬 시간(= 0)
+    - T(n - 1): 오른쪽 배열 정렬 시간
+  - T(n) = n(n - 1) / 2
