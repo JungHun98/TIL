@@ -233,4 +233,16 @@
 - Stack: 자동 저장
   ![](./img/memoryylaout.JPG)
 
-## Byte/Halfword Operations
+## Branch Addressing
+
+- OPcode, 두개의 레지스터, target addess로 Branch 지정
+  ![](./img/branch.JPG)
+- PC 상대 주소 지정
+  - Target address = PC + 현재 offset × 4
+  - PC는 현재 실행중인 명령보다 4만큼 크다.
+
+## Jump Addressing
+
+- Junp 명령으로 이동될 주소
+  ![](./img/jump.JPG)
+  - address에 저장된 주소의 4배의 주소로 이동한다.
