@@ -1,9 +1,13 @@
 ## Classes of Computers
 
 - Personal computers(PC)
+  - 일반적으로 개인이 사용하도록 설계된 컴퓨터
 - Server computers
+  - 여러 사용자를 위한 더 큰 프로그램을 동시에 실행하는데 사용되며 일반적으로 네트워크를 통해서만 액세스되는 컴퓨터
 - Supercomputers
+  - 최고의 성능 및 비용을 갖춘 컴퓨터, 서버로 구성된다.
 - Embedded computers
+  - 다른 장치 내부의 컴퓨터, 엄격한 전력, 성능, 비용의 제약이 있다.
 
 ## Understanding Performance
 
@@ -40,9 +44,9 @@
 ## Levels of Program Code
 
 - High-level language
-- Assembly language
+- Assembly language(컴파일러)
   - 명령어의 텍스트 표시
-- Hardware representation
+- Hardware representation(어셈블러)
   - 이진 정수로 이루어짐
 
 ## Components of a Computer
@@ -76,17 +80,17 @@
 - Throughput: 단위시간당 작업합계
 
 - Relative Performance
-  - 1/실행시간
+  - Performance = 1/Execution Time
   - Example: 실행 시간 비교
     - 10s A, 15s B
     - B의 실행시간 / A의 실행시간 = 1.5
-    - B는 A보다 1.5배 더 빠르다.
+    - A는 B보다 1.5배 더 빠르다.
 
 ## Measuring Execution Time(실행시간 측정)
 
 - Elapsed time(경과 시간)
   - 모든 측면을 포함한 응답시간
-    - 프롯싱, 입출력, OS overhead, idle time
+    - 프로세싱, 입출력, OS overhead, idle time
     - 시스템 성능을 나타낸다.
 - CPU time
   - 지정된 작업을 처리하는 데 소요된 시간
@@ -96,8 +100,9 @@
 ## CPU Clocking
 
 - 고정 속도 Clock에 의해 제어되는 디지털 하드웨어의 작동
+- CPU Clock cycle: 어떤 일을 수행하는 주기
 - Clock period: Clock cycle의 지속 시간
-- Clock frequency: 사이클/초
+- Clock frequency(rate): 사이클/초
 
 ## CPU Time
 
@@ -120,6 +125,8 @@
 ## Instruction Count and CPI
 
 ![](./img/123.JPG)
+
+- CPI(Cycles Per Instruction): 명령어 하나를 처리하는데 필요한 클럭 사이클 수<br>
 
 - CPI Example
 

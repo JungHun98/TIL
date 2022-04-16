@@ -35,7 +35,7 @@
 
 ## Memory Operands
 
-- 데이터를 메모리에 저장하고 가져오는(load)연산이다.
+- 데이터를 메모리에 저장(store)하고 가져오는(load)연산이다.
 - 메모리는 byte addressed이다.
 - Example
 
@@ -188,6 +188,7 @@
 ## Basic Blocks
 
 - 명령어들의 나열
+  - 인스트럭션이 수행되면 끝까지 수행되는 구간
   - 마지막 부분을 제외하고 중간에 branch를 작성할 수 없다.
   - 첫 부분을 제외하고 중간에 branch target을 작성할 수 없다.
 
