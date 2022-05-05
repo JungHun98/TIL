@@ -35,6 +35,32 @@
 
 - 만약 프로세스의 메모리가 연속되지 않고 나뉘어서 할당된다면 다른 프로세스의 메모리에 침범 할 가능성이 있다. 그 문제를 해결하기 위한 기법이 Contiguous Memory Allocation, 연속적인 프로세스 메모리 할당이다.
 
-- 하지만 이 방법은 메모리 조각화를 발생시킬 수 있어서 남은 공간이 충분하더라도 프로세스를 메모리에 할당할 수 없다
+- 하지만 이 방법은 메모리 조각화를 발생시킬 수 있어서 남은 공간이 충분하더라도 프로세스를 메모리에 할당할 수 없다.(External Fragmentation)
 - 이를 해결하기 위해 Garbege collection을 사용하기도 하는데 이는 메모리의 이동이 발생하기 때문에 속도가 느려진다.
 - 따라서 이 프로세스 메모리 할당방법은 사용하지 않는다.
+
+## Solutions to External Fragmentation
+
+- 메모리 조각화를 해결하는 방법
+
+### Paging
+
+- Process를 저장하는 virtual memory를 page단위로 나누고, 같은 크기로 physical memory를 frame으로 나눈다.
+
+- 이후 파일을 Disk에 저장할 때 처럼 virtual memory의 데이터를 DRAM frame에 나누어서 저장한다.
+- page-frame관계를 page table에 저장한다. 프로세스의 몇번 page가 몇번 frame에 저장되어있는지를 나타내는 table이다.
+  ![](./img/paging.JPG)
+- virtual memory address와 physical memory address를 mapping할때 소프트웨어를 사용하지 않고 MMU만을 사용해 주소를 얻어낸다.
+
+### Address Translation Architecture
+
+![](./img/ATA.JPG)
+
+- 주소는 일정한 같은 비트 수를 사용하는데 같은 비율로 비트를 쪼갠다.
+- page number(p) - 현재 virtural address를 mapping시킬 physical address의 base number를 저장할 page table의 index로 사용된다.
+- page offset (d) - 데이터가 저장될 page와 fram의 위치를 나타낸다.
+- page의 단위는 512byte~16MB크기로 하드웨어에서 결정된다.
+
+- 이때 page size가 2<sup>n</sup>, virtual address의 비트수가 m이라면 page offset의 비트수를 n, 나머지 비트는 page number를 표현하는데 사용한다.
+  ![](./img/logical%20address.JPG)
+  ![](./img/paging%20ex.JPG)
