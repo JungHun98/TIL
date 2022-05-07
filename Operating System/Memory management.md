@@ -64,3 +64,47 @@
 - 이때 page size가 2<sup>n</sup>, virtual address의 비트수가 m이라면 page offset의 비트수를 n, 나머지 비트는 page number를 표현하는데 사용한다.
   ![](./img/logical%20address.JPG)
   ![](./img/paging%20ex.JPG)
+
+## Internal Fragmentation
+
+- 할당된 메모리의 크기는 요청된 메모리보다 약간 클 수 있는데 사용되지 않는 공간을 Internal Fragmentation이라고 한다.<br>
+  Example) page size : 2048 bytes, 72,766 bytes크기의 프로세스가 35개의 page + 1086 bytes만큼의 메모리가 필요하다면 , 36frame이 할당된다. 그러면 사용되지 않는 메모리의 크기는 2048 - 1086 = 962bytes가 된다.
+- page의 크기가 4096일때가 가장 적합한 크기다.
+
+## Memory Protection
+
+- 운영체제 및 기타 프로세스의 코드 및 데이터에 대한 불법 액세스를 방지해야 한다.
+- 해결책: 각 page마다 protection bit 설정하기
+  - protection bit는 page entry마다 설정한다.
+  - 하나의 비트가 page의 read-write, read-only를 나타낸다.
+    - 0: 수정불가
+    - 1: write 가능
+  - 메모리의 접근하면 MMU가 protection bit를 확인한다.
+    - 만약 bit가 0인 메모리에 write를 시도하면 프로세스에게 OS가 종료 signal을 보낸다.
+
+## Valid-Invalid Bit
+
+- 프로세스의 가상 주소 공간의 일부만 physical memory에 매핑될 수 있다. 일부 페이지는 연결된 프레임에 매핑되지 않을 수 있다. 페이지가 프레임에 매핑되어 있지 않은지 여부를 표시하여 적절한 작업을 수행해야 한다.
+
+- virtual memry가 physical memory보다 클 경우 매핑되지 않을 수 있다.
+- 매핑 여부를 표시하기 위해 valid-invalid bit를 사용한다.
+  - valid-invalid bit는 page entry마다 추가한다.
+    - valid: 해당 page는 frame에 매핑되어있다.
+    - invalid: 해당 page는 frame에 매핑되어있지 않다.
+- 메모리에 접근하려고 하면 bit를 확인한다.
+  - 만약 invalid bit인 page에 접근하면 Exception이 발생하고 프로세스가 종료된다.
+    ![](./img/valid-invalid.JPG)
+
+## Shared Pages
+
+- 보통 문자코드는 읽기 전용이다. 즉, 실행 중에는 변경되지 않는다. 따라서 물리적 메모리 공간을 불필요하게 낭비하지 않기위해 프로세스들은 복사된 코드를 공유하도록한다. 단, 프로세스마다 가지고 있는 data는 서로 공유하면 안된다.
+  ![](./img/shared%20page.JPG)
+
+## Hierarchical Page Table
+
+- 대부분의 컴퓨터 시스템은 큰 logical address space를 지원한다. (2<sup>32</sup> ~ 2<sup>64</sup>) page table의 크기가 과도하게 커진다.
+- 해결책은 페이지 테이블을 비연속적으로 할당하는 것이다. page table을 page unit단위로 쪼개서 관리한다.
+  ![](./img/Hierarchical.JPG)
+- outer page table의 각 page table entry에는 page에 대한 매핑정보와 page table의 할당된 frame이 포함된다.
+- logical address는 32bit의 크기인데 그중 10bit는 outer page number, 10bit는 page of page table number, 나머지는 page offset을 담고 있다.
+  ![](./img/7.JPG)
