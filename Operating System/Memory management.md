@@ -108,3 +108,5 @@
 - outer page table의 각 page table entry에는 page에 대한 매핑정보와 page table의 할당된 frame이 포함된다.
 - logical address는 32bit의 크기인데 그중 10bit는 outer page number, 10bit는 page of page table number, 나머지는 page offset을 담고 있다.
   ![](./img/7.JPG)
+
+## Segment
