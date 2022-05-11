@@ -66,3 +66,60 @@ public static int knapsack2(int n, int[] p, int[] w, int W){
   return maxProfit;
 }
 ```
+
+## Example 2
+
+### The 0-1 Knapsack Problem (Best-First Search)
+
+- bound값을 promising을 판별한다음 확장할 다음 node를 선택하는데 활용한다.
+- 우선순위가 node의 bound값에 의해 결정되는 우선순위 큐를 사용한다.(큰 값이 높은 우선순위)
+- 예제 1과 비슷하게 흘러가지만 node를 확장할 때 우선순위에 따라서 확장한다.
+- 먼저 현재 node의 child node를 두개 생성하고 현재 best solution과 child bound값을 비교하여 child bound값이 큰 node를 우선순위 큐에 삽입한다.
+- 큐에서 node를 하나씩 꺼내면서 반복한다.
+  ![](./img/knapscak2.JPG)
+
+```
+bound 함수는 위 예제와 동일함.
+
+public class node{
+  int level;
+  int profit;
+  int weight;
+  float bound;
+}
+
+public static int knapsack3(int n, int[] p, int[] w, int W){
+  priority_queue_of_node PQ; node u,v;
+  int maxProfit;
+
+  v.level = 0; v.profit = 0;
+  v.weight = 0; maxProfit = 0;
+  v.bound = bound(v);
+  enqueue(PQ, v);
+
+  while(!Empty(PQ)){
+    dequeue(PQ, v);
+    if(v.bound > maxProfit){
+      u.level = v.level + 1;
+
+      //take care of the left child;
+      u.weight = v.weight + w[u.level];
+      u.profit = v.profit + p[u.level];
+
+      if(u.weight <= W && u.profit > maxProfit)
+        maxProfit = u.profit;
+
+      u.bound = bound(u);
+      if(u.bound > maxProfit)
+        enqueue(PQ, u);
+
+      //take care of right child
+      u.weight = v.weight;
+      u.bound = bound(u);
+      u.profit = v.profit;
+      if(u.bound > maxProfit)
+        enqueue(PQ, u);
+    }
+  }
+}
+```
