@@ -123,3 +123,62 @@ public static int knapsack3(int n, int[] p, int[] w, int W){
   }
 }
 ```
+
+## Example 3
+
+### The Traveling SalesPerson Problem
+
+- 시작 지점에서 모든 node를 방문하여 다시 돌아오는 경로중의 최소 경로를 구하는 알고리즘.
+- state space tree의 node는 방문경로 [i<sub>1</sub>, i<sub>2</sub>, ... i<sub>k</sub>]와 bound를 저장한다.
+- bound는 최소경로를 구하는 문제이기 때문에 현재 node에서 계속해서 확장할 경우 가질 수 있는 최소경로를 구한다.
+- bound계산방법
+  - root node bound: 각 node마다 나가는 edge중 가장 작은 값을 모두 더함.
+    ![](./img/rootbound.JPG)
+  - 이미 [i<sub>1</sub>, i<sub>2</sub>, ... i<sub>k</sub>]를 지난 node: root node와 마찬가지로 나가는 최소 가중치를 더해 최소경로를 구하는데 제외해야 할 경로가 있다.
+    1. 이미 지나온 경로
+    2. 지나지 않은 vertax의 가장 짧은 나가는 경로가 이미 지나온 vertax로 향하는 경로
+    3. 마지막으로 방문한 node가 시작 node로 향하는 경로
+       ![](./img/nodebound.JPG)
+- Best-First Search로 탐색한다.
+  - 우선순위 queue 이용
+  1. root lower bound를 계산
+  2. 자식 node들의 lower bound 계산
+  3. 자식 node의 bound가 best solution보다 작다면 queue에 추가.
+  4. queue에서 가장 낮은 bound의 node를 탐색하고 promising(bound < best solution)을 확인하기.
+  5. 마지막 node에 다다르면 bound가 아닌 실제 방문경로 구하기, queue에 삽입하지 않는다. best solution과 비교해 더 작으면 update해준다.
+  6. 2~5를 queue가 빌 때 까지 반복한다.
+
+```
+public static number travel2(int n, number[] W, node optTour){
+  priority_queue_of_node PQ; node u, v;
+  number minLength;
+
+  initialize(PQ);
+  v.level = 0; v.path = [1]; minLength = infinite;
+
+  v.bound = bound(v);
+  enqueue(PQ, v);
+  while(!Empty(PQ)){
+    dequeue(PQ, v);
+    if(v.bound < minLength) // v is promising
+      //take care of children
+      u.level = v.level +1;
+      for (all i such that 2≤ i ≤ n && i not in v.path) { // 탐색할 node선별
+            u.path = v.path ; put i at the end of u.path;
+            if ( u.level == n-2 ) {
+                put index of only vertex not in u.path at the end of u.path;
+                put 1 at the end of u.path;
+                if (length(u) < minLength) {
+                    minLength = length(u); optTour = u.path;
+                }
+            }
+            else {
+                u.bound = bound(u);
+                if (u.bound < minLength )
+                    enqueue(PQ,u);
+            }
+  }
+  return minLength;
+}
+
+```
