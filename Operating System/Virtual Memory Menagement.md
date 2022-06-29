@@ -75,3 +75,59 @@
   - 각 page table entry마다 페이지와 연관된 modify bit가 있다.
   - page가 수정될 때마다 page의 modify bit는 하드웨어(MMU)에 의해 결정된다.
   - 교체로 인해 페이지를 교체할 때 커널은 modify bit가 설정되어 있는지 확인한다. 이 경우 수정된 내용이 손실되지 않도록 페이지를 디스크에 기록해야한다.(modify bit == 1) <br>그렇지 않은 경우 페이지는 삭제되고 새 페이지로 덮어쓰기만 하면된다.(modify bit == 0)
+
+![](./img/modify.JPG)
+
+## Page Replacement Algorithm
+
+- page 교체가 필요할 때, 교체 할 page를 고르는 알고리즘이다.
+- page fault 비율은 Page Replacement Algorithm에 따라 달라진다. page fault가 적은 알고리즘을 선택해야 한다.
+
+- Reference string
+  - 페이지 참조의 시퀀스, 참조할 페이지 번호가 나열된다.<br>
+    ex) 1, 2, 3, 4, 1, 2
+  - 이 문자열에서 page fault 수를 계산하여 페이지 교체 알고리즘을 평가하는 데 사용된다.
+
+### FIFO Page Replacement
+
+- 가장 오래동안 메모리에 머물러 있던 page를 교체 할 page로 선택하는 알고리즘
+- 가장 먼저 memory에 로드된 page를 선택하여 교체한다.
+
+![](./img/prfifo.JPG)
+
+### Optimal Page Replacement
+
+- 가장 오래동안 사용되지 않을 page를 교체 할 page로 선택한다.
+- 하지만 미래에 접근될 page를 판단할 수 없다. 실제로 사용될 수 없는 알고리즘.
+
+![](./img/optimal.JPG)
+
+### LRU Page Replacement
+
+- Optimal Page Replacement의 근사한 알고리즘이다.
+- 커널은 최근 과거를 가까운 미래의 reference string의 근사치로 사용한다. (과거를 통해 미래를 예측)
+- 가장 먼 과거에 접근했던 page를 가장 오래동안 사용되지 않을 page로 간주하여 교체 할 page로 선택한다.
+
+![](./img/LRU.JPG)
+
+### LRU-Approximation Page Replacement
+
+- 완벽한 LRU 페이지 교체를 위한 충분한 하드웨어 지원을 제공하는 컴퓨터 시스템은 거의 없다. 비슷하게 구현을 할 수 있다.
+- reference bit
+  - 많은 시스템이 reference bit를 제공한다.
+  - page에 대한 reference bit는 page가 참조될 때마다 하드웨어에 의해 설정된다.
+- 기본 작업
+  - 모든 reference bit는 커널에 의해 0으로 초기화된다.
+  - 참조된 각 페이지와 관련된 reference bit는 하드웨어에 의해 설정된다.
+  - 어느 정도 시간이 지나면 커널은 reference bit를 조사함으로써 어떤 페이지가 사용되었고 어떤 페이지가 사용되지 않았는지 알 수 있다.
+
+### Second-Chance Algorithm
+
+- 기본 알고리즘
+  - 처음에는 모든 페이지가 circular queue에서 관리되는 것으로 가정한다.
+  - 커널은 주기적으로 루틴을 호출하여 페이지의 reference bit를 검사한다.
+  - 값이 0이면 커널이 해당 page를 교체한다.
+  - 값이 1이면 0으로 변경하여 한 번의 기회가 더 주어진다.
+  - 커널이 circular queue의 다음 페이지를 선택하기 위해 이동한다.
+
+![](./img/second.JPG)
