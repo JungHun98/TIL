@@ -131,3 +131,8 @@
   - 커널이 circular queue의 다음 페이지를 선택하기 위해 이동한다.
 
 ![](./img/second.JPG)
+
+### Thrasing
+- 짧은 시간동안 page fault가 많이 발생하는 현상
+- 원인: 메모리 크기가 많은 프로세스를 실행시키기에는 작음
+- page fault가 발생하면 Disk I/O가 발생하므로 CPU의 성능이 저하된다.
