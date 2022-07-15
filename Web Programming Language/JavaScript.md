@@ -177,3 +177,123 @@ if('' || undefined || a || null || NaN){
     // 빈 문자열, undefined, 빈 변수, null, NaN은 모두 false로 취급함.
 }
 ```
+
+# 반복문
+- 반복문은 컴퓨터에게 반복적인 작업을 지시하는 방법이다.
+1. while 문
+```
+while(조건){
+    // code.
+}
+
+var i = 0;
+
+while(i < 3){
+    //반복이 실행될 때마다 Hello world!가 출력된다.
+    console.log("Hello world!");
+    // i의 값이 1씩 증가한다.
+    i = i + 1;
+}
+// Hello world!
+// Hello world!
+// Hello world!
+
+// 조건을 만족하는 동안 while문 안쪽의 code 실행, 반복 횟수를 특정할 수 없을 때 사용하는게 좋다.
+```
+
+2. for문
+```
+for(초기화; 반복조건; 반복이 될 때마다 실행되는 코드){
+    //code.
+}
+
+for(var i = 0; i < 3; i++){
+    console.log("Hello world! " + i);
+}
+//위쪽 while문과 같은 실행
+
+// Hello world! 1
+// Hello world! 2
+// Hello world! 3
+
+//for문은 반복 횟수를 특정할 수 있을 때 사용하는게 좋다.
+```
+
+3. 반복문의 제어
+- 반복문을 언제까지 실행할 것이냐?
+```
+for(var i = 0; i < 10; i++){
+    if(i === 5){
+        break;
+    }
+    console.log("Hello world! " + i);
+}
+
+// Hello world! 1
+// Hello world! 2
+// Hello world! 3
+// Hello world! 4
+
+// break는 현재 반복문을 종료시키고 바깥으로 빠져나가는 역할을 한다.
+
+for(var i = 0; i < 10; i++){
+    if(i === 5){
+        continue는;
+    }
+    console.log("Hello world! " + i);
+}
+
+// Hello world! 1
+// Hello world! 2
+// Hello world! 3
+// Hello world! 4
+// Hello world! 6
+// Hello world! 7
+// Hello world! 8
+// Hello world! 9
+
+// continue는 반복문을 중지하고 다음 동작을 실시한다.
+```
+
+# 함수
+- 함수란 하나의 로직을 재실행 할 수 있도록 하는 것으로 코드의 재사용성을 높여준다.
+```
+function 함수명(parameter){
+    //code .
+    
+    //return 반환값;
+}
+
+fucntion numbering(){
+    console.log(1);
+} 
+// 함수 정의
+
+numbering(); // 1 출력
+//함수 호출
+```
+- 함수는 한 번 정의해두면 여러번 사용할 수 있다. 중복을 제거하는데 유용하게 사용
+
+- 다양한 함수 정의 방법
+```
+var numbering = function (){
+    i = 0;
+    while(i < 10){
+        document.write(i);
+        i += 1;
+    }   
+}
+numbering(); //123456789 출력
+
+// 변수에 함수를 대입 할 수 있다. 변수이름으로 함수를 호출할 수 있다.
+
+(function (){
+    i = 0;
+    while(i < 10){
+        document.write(i);
+        i += 1;
+    }   
+})();
+
+// 익명함수 = 함수의 이름이 없고 바로 호출되는 함수, 일회성으로 호출할 때 사용된다.
+```
