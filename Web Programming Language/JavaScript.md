@@ -343,3 +343,61 @@ li.sort()
 li.reverse()
 // 배열을 내림차순으로 정렬한다.
 ```
+
+# 객체(Object)
+- 객체는 데이터에 대한 색인(index)을 숫자를 포함해 여러가지로 표현 할 수 있다.
+- 배열은 index를 정수로 표현했다. 객체는 문자열, 정수 등 다양하게 표현할 수 있다.
+- 다른 프로그래밍언어에서는 associative array또는 map, dictionary라는 데이터 타입이 객체에 해당한다.
+
+```
+//객체의 선언 1
+var grade = {'egoing' : 10, 'k8805' : 6, 'sorialgi' : 80};
+
+//객체의 선언 2
+var grade = {}; //빈 객체 선언
+var grade = new Object();
+
+grade['egoing'] = 10;
+grade['k8805'] = 6;
+grade['sorialgi'] = 80;
+
+//egoing, k8805, sorialgi가 10, 6, 80의 index다.
+//data type은 Object
+
+console.log(grade['egoing']); // 10 출력
+// 배열에서 데이터를 가져올 때 처럼 대괄호([])안에 index를 삽입한다.
+
+console.log(grade.k8805); // 6 출력
+// 객체는 이런 식으로도 값을 가져올 수 있다.
+
+// 객체와 반복문
+
+for(key in grade){
+    console.log("key : ," + key + " value : " + grade[key]);
+}
+// 변수 key에는 객체의 key값을 하나씩 저장하여 반복문을 실행한다.
+// for-in 반복문은 객체의 모든 key값을 꺼낸다. 
+
+// key : egoing, value : 10
+// key : k8805, value : 6
+// key : sorialgi, value : 80
+```
+- 객체의 데이터는 배열과 달리 순서가 없다.
+- 객체에는 객체를 담을 수도 있고, 함수를 담을 수도 있다.
+```
+var grades = {
+    'list': {'egoing': 10, 'k8805': 6, 'sorialgi': 80},
+    'show' : function(){
+        for(var name in this.list){
+            console.log(name+':'+this.list[name]);
+        }
+    }
+};
+// this는 객체 자신(this === grades)을 가리킨다.
+
+grades.show(); //grades의 show호출
+
+// egoing : 10
+// k8805 : 6
+// sorialgi : 80
+```
