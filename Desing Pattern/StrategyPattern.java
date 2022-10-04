@@ -1,9 +1,9 @@
 // 특정계열의 알고리즘을 정의하고 캡슐화
-public interface FlyBehavior {
+interface FlyBehavior {
     void fly();
 }
 
-public interface QauckBehavior{
+interface QauckBehavior{
     void qauck();
 }
 
