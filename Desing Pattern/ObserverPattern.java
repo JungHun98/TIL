@@ -89,11 +89,12 @@ class TempDisplay implements Observer, DisplayElement{
     private float temp;
     private float humi;
     private float pressure;
-    private WeatherData weatherData;
+    private WeatherData weatherData; // 구독할 subject
 
     public TempDisplay(WeatherData weatherData){
         this.weatherData = weatherData;
-        weatherData.registerObserver(this);
+        weatherData.registerObserver(this); 
+        // subject의 observer register를 observer에서 호출 
     }
 
     @Override
