@@ -99,7 +99,7 @@ class TempDisplay implements Observer, DisplayElement{
 
     @Override
     public void display() {
-        
+        // Override ...
     }
 
     @Override
