@@ -1,14 +1,15 @@
 # Structured Query Language(SQL)
 
-- DML, Intergrity, View definition, Transaction control, Embedded SQL and dynamic SQL, Authorization들로 이루어져 있다.
+- DML, Intergrity, View definition(가상의 테이블), Transaction control, Embedded SQL and dynamic SQL, Authorization들로 이루어져 있다.
 
 ## Data Definition Language(DDL)
 
-- Schema, Attributes의 type, Integrity, Indices(색인), 보안과 권한을 설정할 수 있다.
+- Schema, Attributes의 type, Integrity, Indices(색인), 보안과 권한을 설정할 수 있다.(테이블 정의)
 
 - Domain Types in SQL
   - `char(n).` n의 크기로 고정된 문자열
   - `varchar(n)` 최대 n의 크기까지의 가변길이 문자열
+    - 데이터를 저장 할 때 메모리 공간의 효율성을 위해 고정길이, 가변길이의 문자열을 따로 사용한다.
   - `int`, `smallint` 정수, 작은 정수
   - `numeric(p,d)` p개의 숫자를 소수점 d자리까지 정확하게 기억하는 Type
   - `real, double, precision` 실수
@@ -18,7 +19,7 @@
 
 - SQL Table은 `create table` 명령어로 생성 할 수 있다.<br>
 
-  ```
+  ```sql
   create table instructor (
                   ID char(5),
                   name varchar(20),
@@ -33,7 +34,7 @@
   - primary key (A1, ..., An ) : 기본키 설정
   - foreign key (Am, ..., An ) references r : 외래키 설정
   - not null : null로 setting 불가능
-  ```
+  ```sql
   create table instructor (
                   ID char(5),
                   name varchar(20) not null,
@@ -46,24 +47,24 @@
 ## Updates to tables
 
 - Insert
-  ```
+  ```sql
   insert into instructor values ('10211', 'Smith', 'Biology', 66000);
-  <!-- instructor table에 해당 tuple을 삽입 -->
+  -- instructor table에 해당 tuple을 삽입
   ```
 - Delete
-  ```
+  ```sql
   delete from student
-  <!-- student table의 모든 tuple 삭제 -->
+  -- student table의 모든 tuple 삭제
   ```
 - Drop Table
-  ```
+  ```sql
   drop table r
-  <!-- r table 영구 삭제 -->
+  -- r table 영구 삭제
   ```
 - Alter
-  ```
+  ```sql
   alter table r add A D
-  <!-- r table에 새로운 Attribute, Domain type 추가, 처음에는 모두 null로 초기화 된다. -->
+  -- r table에 새로운 Attribute, Domain type 추가, 처음에는 모두 null로 초기화 된다.
   ```
 
 ## Basic Query Structure

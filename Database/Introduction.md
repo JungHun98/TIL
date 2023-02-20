@@ -25,7 +25,7 @@
 
   Example
 
-  ```
+  ```sql
   create table instructor (
             ID char(5),
             name varchar(20),
