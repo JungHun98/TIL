@@ -510,7 +510,9 @@ for(key in grade){
 ```
 - 객체의 데이터는 배열과 달리 순서가 없다.
 - 객체에는 객체를 담을 수도 있고, 함수를 담을 수도 있다.
+    - key값으로는 사용하면 안된다.
 - 객체는 const로 선언해도 객체의 데이터를 수정 할 수 있다. 하지만 새로운 객체를 참조할 수는 없다.
+
 ```js
 var grades = {
     'list': {'egoing': 10, 'k8805': 6, 'sorialgi': 80},
@@ -527,8 +529,314 @@ grades.show(); //grades의 show호출
 // egoing : 10
 // k8805 : 6
 // sorialgi : 80
-```
 
+let idx = 0;
+const  obj = {
+  ['key-' + ++idx]: `value-${idx}`, // key-1:value-1
+  ['key-' + ++idx]: `value-${idx}`, // key-2:value-2
+  ['key-' + ++idx]: `value-${idx}`, // key-3:value-3
+  [idx ** idx]: 'POWER' // 27:POWER
+}
+
+console.log(obj);
+
+delete obj.27 //property 삭제
+
+// ES6 추가 문법
+// 객체 선언 시 프로퍼티 키와 대입할 상수/변수명이 동일할 시 단축 표현
+function createProduct (name, price, quantity) {
+  return { name, price, quantity };
+}
+
+const product1 = createProduct('선풍기', 50000, 50);
+const product2 = createProduct('청소기', 125000, 32);
+
+console.log(product1, product2);
+// { name:선풍기, price:50000, quantity:50 }
+// { name:청소기, price:125000, quantity:32 }
+
+// ⭐️ 메서드 정의
+const person = {
+  name: '홍길동',
+  
+  salutate (formal) {
+    return formal
+    ? `안녕하십니까, ${this.name}입니다.`
+    : `안녕하세요, ${this.name}이에요.`;
+  }
+}
+
+console.log(person.salutate(true));
+```
+## 생성자
+```js
+// 생성자 함수 
+function YalcoChicken (name, no) {
+
+  this.name = name;
+  this.no = no;
+  this.introduce = function () {
+    return `안녕하세요, ${this.no}호 ${this.name}점입니다!`;
+  }
+}
+
+// 인스턴스 생성
+const chain1 = new YalcoChicken('판교', 3);
+const chain2 = new YalcoChicken('강남', 17);
+const chain3 = new YalcoChicken('제주', 24);
+// new를 붙이지 않으면 undefined반환됨
+
+// 프로토타입
+// 본사에서 새 업무를 추가
+// 프로토타입: 본사에서 배포하는 메뉴얼이라고 이해
+// 이미 만들어진 객체에 추가되는 property
+YalcoChicken.prototype.introEng = function () {
+  return `Welcome to Yalco Chicken at ${this.name}!`;
+};
+
+/* 
+    객체를 반환하는 함수는 하나의 객체를 만들 뿐이고 생성자 함수는 인스턴스를 만든다. 인스턴스는 프로토타입을 활용할 수 있다.(객체지향)
+    
+*/
+
+// 본사의 정보와 업무
+// 인스턴스로 접근할 수 없는 기능이다. (static)
+YalcoChicken.brand = '얄코치킨';
+YalcoChicken.contact = function () {
+  return `${this.brand}입니다. 무엇을 도와드릴까요?`;
+};
+
+const chain1 = new YalcoChicken('판교', 3);
+console.log(YalcoChicken.contact());
+console.log(chain1.contact()); //오류
+```
+# 클래스
+```js
+class YalcoChicken {
+    //생성자
+    // 생성자는 하나만 선언가능
+  constructor (name, no) {
+    this.name = name;
+    this.no = no;
+  }
+  introduce () { // 💡 메서드
+  // 프로토 타입에 메소드가 저장됨
+    return `안녕하세요, ${this.no}호 ${this.name}점입니다!`;
+  }
+
+  this.introduce () {
+    // this를 붙이면 인스턴스가 가질 수 있는 메소드
+  }
+}
+
+const chain1 = new YalcoChicken('판교', 3);
+const chain2 = new YalcoChicken('강남', 17);
+const chain3 = new YalcoChicken('제주', 24);
+
+// 필드: 생성자 밖에서 this없이 인스턴스의 프로퍼티 정의
+// 필드값이 지정되어 있으므로 constructor 메서드 필요없음
+// 각각의 인스턴스에 초기화된다.(수정 될 수 있음)
+class Slime {
+  hp = 50;
+  op = 4;
+  attack (enemy) {
+    enemy.hp -= this.op;
+    this.hp += this.op/4;
+  }
+}
+
+class YalcoChicken {
+
+  // 정적 변수와 메서드
+  static brand = '얄코치킨';
+  static contact () {
+    return `${this.brand}입니다. 무엇을 도와드릴까요?`;
+  }
+
+  constructor (name, no) {
+    this.name = name;
+    this.no = no;
+  }
+  introduce () {
+    return `안녕하세요, ${this.no}호 ${this.name}점입니다!`;
+  }
+}
+
+console.log(YalcoChicken);
+console.log(YalcoChicken.contact());
+```
+- class는 호이스팅되지 않는다.
+- new를 붙여서 인스턴스를 생성하지 않으면 오류발생
+
+## 접근자 프로퍼티와 은닉
+```js
+const person1 = {
+  age: 17,
+
+  get koreanAge () {
+    // 특정 프로퍼티를 원하는 방식으로 가공하여 내보낼 때 사용
+    return this.age + 1;
+  },
+
+  set koreanAge (krAge) {
+    // 특정 프로퍼티에 값이 저장되는 방식을 조작하거나 제한하는데 사용
+    // 필드와 setter의 이름이 같게 되면 무한 호출 오류가 발생할 수 있다.
+    this.age = krAge - 1;
+  }
+}
+
+// 외관은 메소드처럼 보이지만 호출할 때는 일반 프로퍼티처럼 사용한다.
+console.log(person1, person1.koreanAge); //get 호출, 값을 반환
+
+person1.koreanAge = 20; //set 호출
+// setter는 정상적인 값을 대입해야만 수정이 일어나도록 구현해야한다.
+console.log(person1, person1.koreanAge);
+
+// 은닉화
+class Employee {
+  #name = ''; // private필드, 클래스 내에서만 접근가능
+  #age = 0;
+  constructor (name, age) {
+    this.#name = name;
+    this.#age = age;
+  }
+}
+
+const emp1 = new Employee('김복동', 32);
+
+console.log(emp1.#name); // ⚠️ 오류 발생
+
+// 상속
+class Bird {
+  wings = 2;
+}
+
+// Bird상속, wings 값 포함
+class Eagle extends Bird {
+  claws = 2;
+}
+class Penguin extends Bird {
+  swim () { console.log('수영중...'); }
+}
+
+// Penguin상속, wings, swim()의 기능을 포함
+class EmperorPenguin extends Penguin {
+  size = 'XXXL';
+}
+
+// 자식 클래스에서 부모 클래스의 필드값을 변경할 수 있다.(오버라이딩)
+class Bird {
+  wings = 2;
+  canFly = true;
+  travel () { console.log('비행중...') }
+}
+class Eagle extends Bird {
+  claws = 2;
+}
+class Penguin extends Bird {
+  canFly = false;
+  travel () { console.log('수영중...') }
+}
+
+class YalcoChicken {
+  no = 0;
+  menu = { '후라이드': 10000, '양념치킨': 12000 };
+
+  constructor (name, no) {
+    this.name = name;
+    if (no) this.no = no;
+  }
+  introduce () {
+    return `안녕하세요, ${this.no}호 ${this.name}점입니다!`;
+  }
+  order (name) {
+    return `${this.menu[name]}원입니다.`
+  }
+}
+
+class ConceptYalcoChicken extends YalcoChicken {
+  #word = '';
+  constructor (name, no, word) {
+    super(name, no);
+    this.#word = word;
+  }
+  introWithConcept () {
+    // 부모 클래스의 메소드 호출
+    return super.introduce() + ' ' + this.#word;
+  }
+  order (name) {
+    // 부모 클래스의 메소드 호출
+    return super.order(name) + ' ' + this.#word;
+  }
+}
+
+const pikaChain = new ConceptYalcoChicken('도봉', 50, '피카피카~');
+```
+## 스프레드와 디스트럭쳐링
+```js
+const class1 = {
+  x: 1, y: 'A', z: true
+};
+
+const class2 = { ...class1 }; 
+// 클래스 프로퍼티 가져오기, 프로퍼티가 참조형이라면 얕은복사가 일어남
+
+// 아래의 참조복사 코드와 다름!
+// const class2 = class1;
+
+console.log(class2);
+
+
+const obj1 = {
+  x: 1, y: 2, z: 3
+};
+
+const x = obj1.x;
+const y = obj1.y;
+const z = obj1.z;
+
+console.log(x, y, z); // 1 2 3
+
+// 디스트럭쳐링, 위 코드와 같은 결과
+const {x, y, z} = obj1;
+
+console.log(x, y, z); // 1 2 3
+
+// 일부만 가져오는 것도 가능하다.
+const {x, z} = obj1;
+
+console.log(x, z);
+
+const array1 = [1, 2, 3, 4, 5];
+
+// const length = array1.length;
+const { length } = array1;
+
+console.log(length);
+
+// 디스트럭쳐링 (적절히 활용)
+function introduce({age, married, job, name}) {
+  // 순서 무관
+  // 객체만을 인자로 받아도 된다.
+  // 이 프로퍼티들을 갖는 객체를 인자로 받아 이 프로퍼티만 사용하겠다는 의도 드러냄
+
+  console.log(`제 이름은 ${name}, `
+    + `나이는 ${age}세구요. `
+    + `직업은 ${job}, `
+    + `${married ? '기혼' : '미혼'}입니다.`
+  )
+}
+
+const person1 = {
+  job: '개발자',
+  age: 28,
+  married: false,
+  name: '김철수',
+  blood: 'O'
+};
+
+introduce(person1);
+```
 # 모듈
 - 프로그램은 작고 단순한 것에서 복잡한 것으로 진화한다. 그 과정에서 코드의 재활용성을 높이고, 유지보수를 쉽게 할 수 있는 다양한 기법들이 사용된다. 그 중의 하나가 코드를 여러개의 파일(모듈)로 분리하는 것이다.
     - 자주 사용되는 코드를 별도의 파일로 만들어서 재활용할 수 있다.
@@ -537,10 +845,10 @@ grades.show(); //grades의 show호출
     - 필요한 로직만을 로드해서 메모리의 낭비를 줄일 수 있다.
     - 한번 다운로드된 모듈은 웹브라우저에 의해서 저장되기 때문에 동일한 로직을 로드 할 때 시간과 트래픽을 절약 할 수 있다.
 
-```
-// 모듈화 예시 코드
+```html
+ <!-- 모듈화 예시 코드 -->
 
-// 모듈화 이전
+ <!-- 모듈화 이전 -->
 <!DOCTYPE html>
 <html>
 <head>   
@@ -556,7 +864,7 @@ grades.show(); //grades의 show호출
 </html>
 
 
-// 모듈화
+ <!-- 모듈화 -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -571,10 +879,10 @@ grades.show(); //grades의 show호출
 </html>
 
 
-// greeting.js 파일
+ <!-- greeting.js 파일
 function welcome(){
     return 'Hello world';
-}
+} -->
 ```
 
 # 라이브러리
