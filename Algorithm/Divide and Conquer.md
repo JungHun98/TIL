@@ -49,6 +49,31 @@
      - 나뉜 배열을 결합한다.
 
    ![](./img/mcode.JPG)
+   ```java
+   //Postcondition: U와 V의 값들을 비교해 S에 정렬함
+   public static void merge(int h, int m, keytype[] U, 
+                            keytype[] V, keytype[] S)
+    {
+      int i=1,j=1,k=1;
+
+      // 정렬
+      while(i<=h && j<=m){
+        if(U[i] < V[i]){
+          S[k] = U[i]; i++;
+        }else{
+          S[k] = V[j]; j++;
+        }
+        k++;
+      }
+
+      if(i > h){
+        // copy V[j:m] to S[k:h+m]
+      }
+      else{
+        // copy U[i:m] to S[k:h+m]
+      }
+    }
+   ```
    --Java code--
 
 - 시간 복잡도 분석
@@ -79,7 +104,7 @@
   - input: low, high (subarray의 index중 가장 작은 값과 큰 값)
   - output: 정렬된 배열
 
-  ```
+  ```java
   public static void quickSort(index low, index high){
     index pivotPoint;
 
@@ -96,7 +121,7 @@
   - pivot item의 위치를 반환한다.
   - 정렬할 배열내의 요소들을 하나씩 비교하며 위치를 변경해 partition을 수행한다.
 
-  ```
+  ```java
   public static index partition(index low, index high){
     index i, j, pivotPoint;
     keyType pivotItem = S[low];
