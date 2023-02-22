@@ -897,3 +897,187 @@ function welcome(){
     // 라이브러리로 코드 작성하기
 </script>
 ```
+
+## 주요 빌트인 객체
+### 전역 객체(global object)
+- window(브라우저의 전역객체), global(node.js에서의 전역객체)
+  - globalThis(브라우저, node.js의 전역객체)
+- 호스트 객체
+
+### 표준 빌트인 객체
+- 자바스크립트 표준 사양에 정의된 객체들 - 어떤 환경에서든 사용 가능
+- 전역프로퍼티로 제공됨
+  - globalThis를 붙이지 않고 사용가능
+- window 객체는 자바스크립트의 표준 빌트인 객체를 포함하고 있음
+
+### 래퍼 객체(wrapper object)
+```js
+const str = 'abcd';
+
+str.length;
+str.toUpperCase();
+str[0];
+```
+- 원시값이 어떻게 프로퍼티를 갖고 있을까?
+- 원시값에서 객체를 사용하듯 래퍼 객체가 원시값을 감싸서 인스턴스로 만들고 래퍼 객체의 기능을 사용한 뒤에 원시 객체로 다시 돌아간다.
+
+## 빌트인 전역 프로퍼티와 함수
+### 빌트인 전역 프로퍼티
+- 스스로 다른 프로퍼티나 메소드를 갖지 않고 값만 반환
+- Infinity, NaN, undifined 등의 원시값들은 이 프로퍼티들을 가리킴(null은 포함되지 않는다)
+  - `global.property`
+### 빌트인 전역 함수
+- `eval`: 문자열로 된 코드를 받아 실행
+  - 특별한 경우가 아니면 사용 x, 코드의 보안이 약해지고 속도가 느려짐
+
+- `isFinite`: 유환수 여부 반환
+  - infinity가 아니면 true반환
+  - 문자열, NaN은 false 반환
+
+- `isNaN`: NaN 여부 반환
+  - 숫자로 인식할 수 없는 값은 true반환
+  - Number타입이 아닌 경우 Number로 변환하여 평가
+
+- `parseFloat`: 인자로 받은 값을 실수로 변환
+- `parseInt`: 인자로 받은 값을 정수로 변환(타입은 실수)
+- `encodeURI`, `encodeURIComponent`
+  - URI는 아스키 문자 셋으로만 구성되어야 한다.
+  - URI에서 아스키가 아닌 문자와 일부 특수문자를 포함한 URI를 유효하게 인코딩
+  - `encodeURI`는 전체 URI를 인자로 전달(URI 전체 변환)
+  - `encodeURIComponent`는 아스키 코드가 아닌 부분만 인자로 전달(검색어 변환)
+- `decodeURI`, `decodeURIComponent`: URI 디코딩
+
+## String 객체
+### 생성자 함수
+```js
+const str1 = new String();
+const str2 = new String('hello world');
+
+str2.valueOf(); // 원시값 반환
+
+const fromNum = new String(123); // '123'
+const fromBool = new String(true); // 'true'
+const fromArr = new String([1,2,3]) // '1,2,3"
+const fromObj = new String({x: 1, y: 2}); // '[object Object]'
+```
+### 유사 배열 객체
+```js
+let myStr = 'hello';
+myStr.length;
+myStr[0];
+
+myStr[0] = '1'; // 문자열의 내용은 변경되지 않음
+```
+
+### 주요 인스턴스 메소드
+- `toUpperCase`, `toLowerCase`
+  - 대문자 변환 문자열 반환, 소문자 변환 문자열 반환, 기존의 문자열은 변경되지 않음
+- `charAt`, `at`
+  - 인자로 주어진 인덱스의 문자 반환
+- `indexOf`, `lastIndexOf`
+  - 인자로 주어진 문자열이 앞, 또는 뒤에서 처음 나타나는 인덱스 반환
+  - 포함되지 않을 시 `-1` 반환
+- `includes`, `startWith`, `endsWith`
+  - 인자로 주어진 문자열 포함여부를 불리언으로 반환
+- `search`
+  - 인자로 받은 정규표현식과 일치하는 첫 부분의 인덱스 반환
+  - 없을 시 `-1`반환
+- `subString`
+  - 인자로 전달받은 인덱스를 기준으로 자른 문자열 반환
+- `slice`
+  - 인자로 전달받은 인덱스를 기준으로 자른 문자열 반환
+  - 뒤에서 부터 자를 수 있다.
+- `split`
+  - 인수로 주어진 문자열이나 정규표현식으로 분리하여 배열을 반환
+  - 두 번째 인자는 배열의 최대 길이를 설정
+- `trim`, `trimStart`, `trimEnd`
+  - 문자열의 공백제거
+- `repeat`
+  - 주어진 인자만큼 문자열을 반복하여 반환
+- `replace`, `replaceAll`
+  - 첫 번째 인자로 받은 문자열 또는 정규식을 두 번째 인자로 치환한 결과를 반환
+
+## Number 객체
+### 생성자 함수
+```js
+const numObj1 = new Number();
+const numObj2 = new Number(123);
+const numObj3 = new Number(-123.45);
+
+new Number(1/2) // NaN
+// 숫자의 형태가 아니라면 NaN
+```
+### 정적 프로퍼티
+- `EPSILON`: Number 형에서 표현 가능한 가장 작은 양의 실수
+- `NaN`
+  - 전역 객체 globalThis의 NaN값과 같은 값
+  - Not a Number
+### 정적 메소드
+- `isFinite`, `isNaN`
+  - 인자에는 반드시 숫자 타입만 전달해야 원하는 결과를 얻음
+- `parseInt`, `parseFloat`
+- `isInteger`, `isSafeInteger`
+  - (안전한) 정수 여부 확인
+### 인스턴스 메소드
+- `toExponential`
+  - 지수 표기법으로 나타내는 문자열을 반환
+  - 인자를 넣으면 자릿수를 정할 수 있음
+- `toFixed`
+  - 최대 인자값으로 주어진 정수만큼 소수점 이하를 반올림하여 문자열로 반환
+- `toString`
+  - 문자열 값 반환
+  - 인자가 주어지면 해당 수의 진수로 표현
+
+## Math 객체
+### 주요 정적 프로퍼티
+- Number 타입만 지원
+- `PI`, `E` ...
+
+### 정적 메소드
+- `abs`: 절대값
+- `ceil` 올림, `round` 반올림, `floor` 내림, `trunc` 정수부만
+- `pow` 첫 번째 인자를 두 번째 인자로 거듭제곱
+- `max`, `min` - 인자들 중 최대값과 최소값
+- `rand` - 0~1 무작위 값
+
+## Date 객체
+### 생정자 함수
+```js
+const now = new Date(); // 한국 표준시 문자열 반환
+new Date(0) //그리니치 평균시
+new Date(Y, M, D, H, M, S, Ms) // 전달받은 인자를 사용해 날짜 반환
+```
+### 정적 메소드
+- `now` 현재 시간
+- `parse` 주어진 시간의 밀리초 숫자값 반환
+### 인스턴스 메소드
+- `toString`, `toDateString`, `toTimeString`
+  - 전체, 날짜만, 시간만 나타내는 문자열 출력
+- `toLocaleString`
+  - 인자로 주어진 언어 코드를 기준으로 표현한 문자열 반환
+### 단위별 setter, getter 메소드들
+```js
+for (i of [
+  [ '연:', now.getFullYear() ],
+  [ '월:', now.getMonth() ], // 0 ~ 11
+  [ '일:', now.getDate() ],
+  [ '요일:', now.getDay() ], // 0부터 일월화수목금토 
+  [ '시:', now.getHours() ],
+  [ '분:', now.getMinutes() ],
+  [ '초:', now.getSeconds() ],
+  [ '밀리초:', now.getMilliseconds() ]
+]) {
+  console.log(i[0], i[1]);
+}
+
+now.setFullYear(2022);
+now.setMonth(7);
+now.setDate(20);
+// 💡 요일은 setter가 없음
+now.setHours(14);
+now.setMinutes(35);
+now.setSeconds(47);
+now.setMilliseconds(789);
+
+console.log(now.toString());
+```
