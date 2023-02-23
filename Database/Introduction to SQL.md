@@ -31,7 +31,7 @@
 
 - Integrity Constraints in Create Table
   - SQL은 무결정 제약 조건을 위반하는 데이터베이스 업데이트를 방지한다.
-  - primary key (A1, ..., An ) : 기본키 설정
+  - primary key (A1, ..., An ) : 기본키 설정, null이 될 수 없음
   - foreign key (Am, ..., An ) references r : 외래키 설정
   - not null : null로 setting 불가능
   ```sql
@@ -72,58 +72,59 @@
 - 쿼리문은 대소문자를 구분하지 않는다.
 - The select Clause
 
-  - select 절은 쿼리 결과에 원하는 Attribute를 나열한다. (관계 대수에서 projction에 해당함)
-  - where (instructor.ID, dept_name) = (teaches.ID, 'Biology'); 처럼 튜플단위로 비교가 가능함.
-  - where salary <strong>between</strong> 90000 and 100000 (90000 <= salary <= 100000)
+  - select 절은 쿼리 결과에 원하는 Attribute를 나열한다. (관계 대수에서 projection에 해당함)
+  
 
-  ```
+  ```sql
   select name
   from instructor
-  <!-- instructor table에서 name을 모두 가져옴 -->
+  -- instructor table에서 name을 모두 가져옴
 
   select distinct dept_name
   from instructor
-  <!-- instructor table에서 dept_name을 중복 없이 가져옴 -->
+  -- instructor table에서 dept_name을 중복 없이 가져옴
 
   select *
   from instructor
-  <!-- instructor table의 모든 atrributes를 가져옴 -->
+  -- instructor table의 모든 atrributes를 가져옴
 
   select ID, name, salary/12
   from instructor
-  <!-- select문에서 사직연산이 가능함. salary에서 12를 나눈 몫을 가져옴 -->
+  -- select문에서 사직연산이 가능함. salary에서 12를 나눈 몫을 가져옴
   ```
 
 - The where Clause
 
   - where절은 결과가 충족해야하는 조건을 지정한다.(관계 대수에서 select에 해당함)
   - where절에서 논리 연산, 비교연산이 가능하다.
+  - where (instructor.ID, dept_name) = (teaches.ID, 'Biology'); 처럼 튜플단위로 비교가 가능함.
+  - where salary <strong>between</strong> 90000 and 100000 (90000 <= salary <= 100000)
 
-  ```
+  ```sql
   select name
   from instructor
   where dept_name = 'Comp. Sci.'
-  <!-- instructor table에서 dept_name가 Comp. Sci.인 사람의 이름을 가져옴 -->
+  -- instructor table에서 dept_name가 Comp. Sci.인 사람의 이름을 가져옴
 
   select name
   from instructor
   where dept_name = 'Comp. Sci.' and salary > 70000
-  <!-- instructor table에서 dept_name가 Comp. Sci.인 사람 중 연봉이 70000보다 큰 사람의 이름을 가져옴 -->
+  -- instructor table에서 dept_name가 Comp. Sci.인 사람 중 연봉이 70000보다 큰 사람의 이름을 가져옴
   ```
 
 - The from Clause
 
   - from 절은 쿼리에 관련된 관계를 나열한다.(관계 대수에서 e Cartesian product에 해당함)
 
-  ```
+  ```sql
   select *
   from instructor, teaches
-  <!-- instructor, teaches의 Cartesian product를 가져옴 -->
+  -- instructor, teaches의 Cartesian product를 가져옴(가능한 모든 조합)
 
   select name, course_id
   from instructor , teaches
   where instructor.ID = teaches.ID
-  <!-- instructor, teaches의 Cartesian product를 그냥 가져오면 무의미한 데이터가 추가되므로 where절을 같이 사용하여 무의미한 데이터를 없앨 수 있음 -->
+  -- instructor, teaches의 Cartesian product를 그냥 가져오면 무의미한 데이터가 추가되므로 where절을 같이 사용하여 무의미한 데이터를 없앨 수 있음
 
   ```
 
@@ -131,11 +132,12 @@
 
   - as절은 table 및 attribute의 이름을 변경할 수 있음
 
-  ```
+  ```sql
   select distinct T.name
   from instructor as T, instructor as S
-  where T.salary > S.salary and S.dept_name = 'Comp. Sci.’
-  <!--  instructor table을 T와 S로 변경하여 간결하게 사용한다. -->
+  where T.salary > S.salary and S.dept_name = 'Comp. Sci.'
+  
+  -- instructor table을 T와 S로 변경하여 간결하게 사용한다.
   ```
 
 - String Operations
@@ -151,11 +153,11 @@
 
   - 가져온 데이터를 정렬할 수 있음.
 
-  ```
+  ```sql
   select distinct name
   from instructor
   order by name
-  <!-- 이름순으로 오름차순 정렬(order by name desc은 내림차순 정렬) -->
+  -- 이름순으로 오름차순 정렬(order by name desc은 내림차순 정렬)
   ```
 
 - Set Operations
@@ -169,7 +171,7 @@
 
   - null은 알려지지 않은 값(nukown)이다.
   - null은 사칙 연산, 비교 연산으로 판단하면 잘못된 결과를 가져올 수 있다.
-  - null은 is null 또는 is not null로만 판별해야한다.
+  - null은 is null 또는 is not null로만 판별해야한다. (등호를 사용하면 unknown을 반환한다.)
 
 - Aggregate Functions(집계함수)
 
@@ -179,14 +181,21 @@
     - count(disticnt A): 중복을 제외한 개수
     - count(\*): 모든 tuple의 개수
   - group by A : Tuple을 그룹단위로 집계한다.
-    ```
+    ```sql
     select dept_name, avg (salary) as avg_salary
     from instructor
     group by dept_name;
+    -- 학과 단위로 데이터를 집계한다.
     ```
     ![](./img/1.JPG)
   - 집계함수를 사용할 때 select문에서 사용하지 않은 Attribute들은 `group by`에 포함되어 있어야한다.
-    - having '조건문': 조건에 만족하는 집계를 출력한다.
+    ```sql
+    select dept_name, ID, avg(salary) as avg_salary
+    from instructor
+    group by dept_name;
+    -- ERROR 발생가능
+    ```
+    - `having` '조건문': **집계 후** 조건에 만족하는 데이터를 출력한다.
     - where절은 집계함수 이전에 사용하는 조건문, having절은 집계함수를 사용한 후 작성해 준다.
 
 - Nested Subqueries(중첩 서브쿼리)
@@ -195,34 +204,34 @@
   - where - Set Membership
 
     - 서브쿼리에 포함 여부를 판단한다. (where in, not in)
-      ```
+      ```sql
       select distinct course_id
       from section
       where semester = 'Fall' and year= 2017 and
             course_id (not) in (select course_id
                           from section
-                          where semester = 'Spring' and year= 2018);
+                          where semester = 'Spring' and year = 2018);
       ```
     - where - Set Comparison
 
       - 서브쿼리와 비교한다.
 
-        ```
+        ```sql
         select name
         from instructor
         where salary > some (select salary
                             from instructor
                             where dept name = 'Biology');
-        <!-- 서브쿼리에 존재하는 값 중에서 조건을 만족하는 것이 하나라도 존재하면 선택한다. some 대신 in을 사용할 수 있지만, != some 대신 not in을 사용할 수 없다.-->
+        -- 서브쿼리에 존재하는 값 중에서 조건을 만족하는 것이 하나라도 존재하면 선택한다. some 대신 in을 사용할 수 있지만, != some 대신 not in을 사용할 수 없다.
         ```
 
-        ```
+        ```sql
         select name
         from instructor
         where salary > all (select salary
                             from instructor
                             where dept name = 'Biology');
-        <!-- 서브쿼리에 존재하는 모든 값에서 조건을 만족하면 선택한다. != all 대신 not in을 사용할 수 있지만, all 대신 in을 사용할 수 없다.-->
+        -- 서브쿼리에 존재하는 모든 값에서 조건을 만족하면 선택한다. != all 대신 not in을 사용할 수 있지만, all 대신 in을 사용할 수 없다.
         ```
 
     - where - exists, not exists
