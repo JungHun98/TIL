@@ -73,6 +73,7 @@
 ## Dynamic Bag
 - bag의 크기가 정적으로 정해져 있지 않고 크기가 변하는 bag
 - 만들어지는 bag의 크기가 모두 같지는 않다.
+- data를 저장하는 배열을 가리키는 포인터를 멤버 변수로 갖는다.
   ```cpp
   class bag{
       public:
@@ -80,8 +81,8 @@
         bag(const bag& source); //copy constructor(deep copy)
         /* 복사 생성자의 쓰임
            1. 같은 데이터를 갖는 객체를 만들 때
-           2. 함수의 반환값일 때 (return bag)
-           3. 함수의 매개변수로 사용 될 때
+           2. 함수의 반환값일 때 복사 생성자를 이용해 반환(return bag)
+           3. 함수의 매개변수로 사용 될 때 복사
         */
         ~bag(); // 동적 메모리 공간 반환
         
@@ -105,4 +106,22 @@
         int capacity;
         // 멤버 변수...
   }
+
+  bag::bag(int init_capacity){
+    data = new int[init_capacity]; // 동적 할당
+    capacity = init_capacity;
+    used = 0;
+  }
+  
+  bag::bag(const bag& source){
+    data = new int[source.capacity]; // 포인터를 복사한다면 얕은 복사가 일어나 data sharing 문제가 발생 할 수 있다.
+    capacity = source.capacity;
+    used = source.used;
+    // copy source data to this array
+  }
+  
+  bag::~bag(){
+    delete[] data; // 할당받은 메모리 공간 반환
+  }
   ```
+- 멤버변수가 포인터인 경우에는 소멸자, 복사 생성자, 대입 연산자를 잘 정의해주어야 한다.
