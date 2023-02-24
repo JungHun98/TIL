@@ -96,8 +96,9 @@
 
 - MergeSort와 비슷한점: 하나의 배열을 두개로 나누어서 각각 재귀적으로 정렬한다.
 
-- MergeSort와 다른점: 배열을 세 부분으로 나눈다. (배열1, pivot item, 배열2)
-  pivot item을 기준으로 왼쪽 배열에서는 pivot item보다 작은 값, 오른쪽 배열에는 큰 값을 위치시키고 정렬 후 결합한다.
+- MergeSort와 다른점: 배열을 **하나의 값을 기준**으로 배열을 나눈다. (배열1 < pivot item < 배열2)
+- pivot item을 기준으로 왼쪽 배열에서는 pivot item보다 작은 값, 오른쪽 배열에는 큰 값을 위치시키고 정렬 한다.
+- 병합 과정이 필요없음
   ![](./img/quick.JPG)
 - QuickSort Algorithm
 
@@ -119,7 +120,7 @@
 - Partition Algorithm
 
   - pivot item의 위치를 반환한다.
-  - 정렬할 배열내의 요소들을 하나씩 비교하며 위치를 변경해 partition을 수행한다.
+  - 정렬할 배열 내의 요소들을 하나씩 비교하며 pivot item위치를 변경해가며 partition을 수행한다.
 
   ```java
   public static index partition(index low, index high){
@@ -129,17 +130,18 @@
 
     for(i = low + 1; i <= high; i++){
       if(S[i] < pivotItem){
-        swap S[i], S[++j];
+        // swap S[i], S[++j];
       }
     }
 
   pivotPoint = j;
-  swap S[low], S[pivotPoint];
+  // swap S[low], S[pivotPoint];
   return pivotPoint;
   }
   ```
 
 - Partition Time Complexity
+  - Every case
   - 기본 연산: S[i]와 pivotItem의 비교연산
   - Input Size: m = high - low + 1, subarray의 요소 개수
   - T(m) = m - 1
@@ -153,3 +155,8 @@
     - T(0): 왼쪽 배열 정렬 시간(= 0)
     - T(n - 1): 오른쪽 배열 정렬 시간
   - T(n) = n(n - 1) / 2
+
+## 분할 정복을 사용하지 않는 경우
+- Case1: 입력크기 n인 인스턴스를 나누는데 나뉜 **인스턴스의 크기가 n과 거의 비슷**하도록 나누는 경우
+  - ex) 피보나치 수열을 재귀함수로 표현 한 경우
+- Case2: 입력크기 n인 인스턴스를 **n/c인 크기로 나누는데 나뉜 인스턴스의 개수가 n과 거의 비슷**한 경우
