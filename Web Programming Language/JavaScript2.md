@@ -302,7 +302,7 @@ const iterable = {
 
 ## 제너레이터
 - 함수 내 코드들을 모두 실행하지 않고 외부 호출자에게 제어권을 양도
-- 이터러블과 이터레터들보다 ㅏ간결하게 구현 가능
+- 이터러블과 이터레터들보다 간결하게 구현 가능
 ```js
 // 이터러블의 기능을 갖고 표현은 이터러블보다 더 직관적임
 function* genFunction () {
@@ -340,3 +340,386 @@ let genObj = genFunction();
 - `next`메서드를 실행하면 다음 `yield`까지 실행 후 중지
 - `yield`의 값을 `value`로 반환
 - 끝까지 실행 후 `done: true`
+
+# 문제들에 대비하기
+## 에러 핸들링
+1. 자바스크립트의 에러 핸들링
+- `try ... catch`문
+  ```js
+  console.log('에러 발생 전');
+
+  try {
+    // 에러 방생 여지가 있는 코드
+    // 이곳에서 발생한 에러는 프로그램을 멈추지 않음
+    (3).split('');
+  }catch(e){
+    // 에러 발생시 실행할 코드
+    // 발생한 오류 객체(e)를 인자로 받음
+    console.log('eroor!!', e);
+  }
+
+  console.log('에러 발생 후');
+
+  // 활용
+  const arr = ['ABC', '가나다', 123, '123'];
+
+  function getLetterArray (str) {
+    // 💡 인자로 어떤 타입의 값이 주어질지 모르는 상황
+    try {
+      return str.split('');
+
+    } catch (e) {
+      console.error('🛑 에러!!', e);
+      return [];
+    }
+  }
+
+  arr.forEach(i => {
+    console.log(getLetterArray(i));
+  });
+  ```
+- `try ... catch ... finally` 문
+  - `finally` 블록
+    - 오류 발생 여부와 관계없으 한 번 실행되는 코드
+    - `try`나 `catch`문에 `return`이 있더라도 반드시 실행됨
+
+  ```js
+  function connect () { console.log('☀️', '통신 연결'); }
+  function disconnect () { console.log('🌙', '통신 연결 해제'); }
+  function sendArray (arr) { console.log('전송', arr); }
+
+  function sendStringAsArray (str) {
+    connect(); // ☀️ 통신 연결
+
+    try {
+      sendArray(str.split(''));
+      return true;
+
+    } catch (e) {
+      console.error('🛑 에러!!', e);
+      return false;
+
+    } finally {
+      // 💡 전송 성공 여부와 관계없이 연결은 끊어야 함
+      // 반드시 실행되는 코드
+      disconnect();
+      console.log('- - - - - - - -');
+    }
+
+    // ❓ 이곳에 넣는 것과 무엇이 다른가?
+    // catch문이 실행되고 나서 함수 종료 밑 명령어들은 실행되지 않는다.
+    // 아래로 대체하여 실행해 볼 것
+    // disconnect();
+    // console.log('- - - - - - - -');
+  }
+
+  ['ABC', '가나다', 123, '123'].forEach(i => {
+    console.log(
+      sendStringAsArray(i) 
+      ? '[성공]' : '[실패]', '\n\n'
+    );
+  });
+  ```
+2. Errro 객체
+- 에러 발생 시 던져지는 thrown 객체
+- 에러에 대한 정보를 담고 있음
+- 에러가 발생하지 않아도, 직접 생성하여 던지기 가능
+- 기본 생성과 사용법
+```js
+const error = new Error('뭔가 잘못됐어');
+
+console.error(error);
+
+// 두 번째 인자로 이유를 명시할 수도 있음
+const error = new Error(
+  '뭔가 잘못됐어',
+  { cause: '뭘 잘못했으니까' }
+);
+
+console.error(error);
+
+// 기본 인스턴스 프로퍼티와 메서드
+console.log(error.name);
+console.log(error.message);
+
+// cause를 입력했을 경우
+console.log(error.cause);
+```
+- 에러의 종류
+  - 모두 Error로부터 상속받음
+  - `SyntaxError`: 문법에 이상이 있음
+  - `TypeError`: 주어진 명령에 적절한 자료형이 아닐 때
+  - `ReferenceError`: 잘못된 값을 참조했을 때
+  - `RangeError`: 유효한 범위를 벗허나는 숫자가 사용되었을 때
+  ```js
+  // 오류 종류에 따라 대처하기
+  errorFuncs.forEach(func => {
+  try {
+    func();
+
+  } catch (e) {
+      if (e instanceof TypeError) {
+        console.error('자료형 확인하세요.');
+        return;
+      }
+      if (e instanceof ReferenceError) {
+        console.error('선언 안 된 거 쓴 거 없는지 확인하세요.');
+        return;
+      }
+      console.error('아니, 뭘 한 거에요?');
+    }
+  });
+  ```
+3. 에러 버블링
+- 다른 함수를 호출했을 때
+  - 에러 발생시 해당 함수에서 잡지 않으면 호출한 곳으로 던져짐
+  - 다중 호출시 에러를 핸들링하는 코드가 있는 호출자까지 전달됨
+  ```js
+  function func1 () {
+  throw new Error('에러');
+  }
+
+  function func2 () {
+    func1();
+  }
+
+  function func3 () {
+    func2();
+  }
+
+  function func4 () {
+    try {
+      func3();
+
+    } catch (e) {
+      console.error(e);
+    }
+    console.log('실행완료');
+  }
+
+  func4();
+  
+  //Error: 에러
+  //  at func1 (<anonymous>:2:9)
+  //  at func2 (<anonymous>:6:3)
+  //  at func3 (<anonymous>:10:3)
+  //  at func4 (<anonymous>:15:5)
+  //  at <anonymous>:23:1
+
+  // 에러는 가능한 발생 한 곳 가까이서 처리하는 것이 좋음
+  ```
+
+## 구시대의 유물 var
+### :star: 정말 중요한 내용이다
+- `var`: `let`과 `const`가 생기기 전 변수 선언에 사용되던 문법
+  - 각종 문제점들을 갖고 있으므로 오늘날에는 사용하지 않을 것을 권장
+
+- 선언 없이도 사용 가능
+```js
+notDeclared = 1; // 미리 선언한 부분이 없을 시 var로 만들어짐
+console.log(notDeclared);
+
+// num이 var로 선언된 것
+for (num of [1, 2, 3]) {
+  console.log(num);
+}
+```
+
+- 재선언 가능
+  - 실수가 발생할 여지가 굉장히 많다
+```js
+let a = 1;
+let a = 2; // ⚠️ 오류
+
+const b = 1;
+const b = 2; // ⚠️ 오류
+
+var c = 1;
+var c = 2;
+```
+
+- 블록 레벨 스코프 무시
+  - 논리 오류가 발생할 가능성이 높다
+```js
+// let은 블록 단위의 스코프
+let num1 = 1;
+{
+  let num1 = 2;
+  {
+    let num1 = 3;
+  }
+}
+
+console.log(num1); // 1
+
+// var는 그딴 거 없다
+// 함수단위 스코프
+var num2 = 1;
+{
+  var num2 = 2;
+  {
+    var num2 = 3;
+  }
+}
+
+console.log(num2); // 3
+
+// for문의 스코프도 무시
+for (var i = 0; i < 5; i++) {
+  var pow2 = i ** 2;
+  console.log(pow2);
+}
+
+console.log(i, pow2); // 5 16, i가 for문 바깥에서 출력이 된다?!
+```
+
+- 호이스팅
+```js
+console.log(hoisted1); // 💡 오류발생 X, 대신 undefined 반환
+
+var hoisted1 = 'Hello'; // 호이스팅
+
+console.log(hoisted1);
+
+console.log(hoisted2); // ⚠️ 오류
+
+let hoisted2 = 'Hello';
+
+console.log(hoisted2);
+```
+- `let`도 호이스팅은 되지만 `var`처럼 `undifined`로 초기화 되지는 않는다.
+
+## 엄격 모드(strict mode)
+### 'use strict'
+- 기존의 느슨한 모드에서 허용되던, 문제를 유발할 수 있는 코드들에 오류를 발생시킴
+1. 선언되지 않는 변수 사용시 오류 발생
+```js
+`use strict`; // 자바스크립트 문서 최당산에 작성 - 문서 전체에 적용됨
+```
+```html
+<!-- 문서, script 태그별로만 적용됨 - 여러 `.js`파일이 페이지에 사용될 시 각각 작성해야 한다. -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script src="./1.js"></script>
+<script src="./2.js"></script>
+</head>
+</html>
+```
+```js
+// 1.js
+'use strict';
+x = 1;
+console.log(x); // 오류 발생
+```
+```js
+// 2.js
+y = 2;
+console.log(y); // 오류 발생하지 않음
+```
+```js
+notDec1 = 1;
+
+function strictFunc () {
+'use strict';
+
+ notDec2 = 2;
+ console.log(notDec2);
+}
+
+console.log(notDec1);
+strictFunc();
+```
+- 위와 같이 함수 최상단에 작성하면 해당 함수에만 적용된다.
+
+2. 변수, 함수, 인자 등 발생할 수 있는 문제
+```js
+// 실제로 지워지지도 않지만 오류를 발생시키지도 않음
+
+let toDelete1 = 1;
+delete toDelete1;
+
+console.log('1.', toDelete1);
+
+function funcToDel1 () { console.log(true); }
+delete funcToDel1;
+
+console.log('2.', funcToDel1);
+```
+```js
+'use strict';
+
+let toDelete2 = 1;
+delete toDelete2;
+
+// Uncaught SyntaxError: Delete of an unqualified identifier in strict mode.
+```
+```js
+// 인자명 중복시 오류발생
+'use strict';
+
+function add(x, x) {
+  return x + x;
+}
+
+console.log(add(1, 2));
+//Uncaught SyntaxError: Duplicate parameter name not allowed in this context
+```
+- 실무에서의 엄격 모드
+   - 클래스나 모듈 사용시 엄격 모드가 기본으로 적용돔
+   - 모든 문제를 방지하는 수단이 되지는 않는다.
+   - 기존 코드에 엄격모드 사용시 예기치 못한 오류 발생 가능성이 있으니 주의해야한다.
+
+## 옵셔널 체이닝
+### 유효하지 않을 수 있는 참조에 의한 문제들
+- 네트워크 요청 등, 어떤 값이 들어올지 모르는 상황에서 에러가 발생하는 상황
+```js
+// undefined로부터 값에 접근할 때
+let undefObj;
+console.log(undefObj.x);
+
+// null부터 값에 접근할 때
+let nullObj = null;
+console.log(nullObj.x);
+
+// 무효한 배열에 접근할 때
+let undefArry;
+console.log(undefArry[1]);
+
+// 존재하지 않는 함수를 호출할 때
+let noFunc = {}
+noFunc.func();
+```
+- `?.` - 옵셔널 체이닝 연산자
+  - 호출 대상이 `undefined`나 `null`이어도 오류를 발생시키지 않고 `undefined`을 반환함
+  - 있을지 없을지 모르는 것으로부터 값을 읽거나 실행할 때 사용한다.
+```js
+let undef = undefined;
+
+console.log(
+  undef?.x,
+  undef?.['x'],
+  undef?.[1],
+  {}.func?.()
+);
+// undefined undefined undefined undefined
+
+
+// 옵셔널 체이닝을 사용한 방법
+const result = notSure();
+
+console.log(
+  result?.prop1?.prop2?.prop3
+);
+
+// 유무가 불확실한 함수를 호출할 때도 유용하다.
+const objs = [
+  { func () { console.log(1) } },
+  {},
+  { func () { console.log(2) } },
+  {},
+  { func () { console.log(3) } },
+]
+
+objs.forEach(o => o.func?.());
+```
