@@ -594,7 +594,7 @@ console.log(hoisted2);
 - 기존의 느슨한 모드에서 허용되던, 문제를 유발할 수 있는 코드들에 오류를 발생시킴
 1. 선언되지 않는 변수 사용시 오류 발생
 ```js
-`use strict`; // 자바스크립트 문서 최당산에 작성 - 문서 전체에 적용됨
+`use strict`; // 자바스크립트 문서 최상단에 작성 - 문서 전체에 적용됨
 ```
 ```html
 <!-- 문서, script 태그별로만 적용됨 - 여러 `.js`파일이 페이지에 사용될 시 각각 작성해야 한다. -->
@@ -723,3 +723,423 @@ const objs = [
 
 objs.forEach(o => o.func?.());
 ```
+
+# 스코프와 바인딩
+## 렉시컬(static)과 클로져
+1. 렉시컬(정적) 스코프
+  - 변수나 상수가 코드상 어디에서 지정되었는가에 따라 그 사용 범위를 결정
+  - 함수가 코드상 어디에서 정의되었는가에 따라 그 상위 스코프를 결정
+  - 호출한 곳을 기준으로 하는 동적 스코프와 상반되는 개념
+```js
+const x = 1;
+const y = 1;
+const z = 1;
+
+function func1 () {
+  const y = 2;
+  const z = 2;
+
+  console.log('2', x, y, z);
+  func2();
+}
+
+function func2 () {
+  const z = 3;
+
+  console.log('3', x, y, z);
+}
+
+
+console.log('1', x, y, z)
+func1();
+
+// 1 1 1 1
+// 2 1 2 2
+// 3 1 1 3
+```
+- `func2`을 호출한 블록에서의 `y`값은 `2`
+- `func2`을 정의된 블록에서의 `y`값은 `1`
+- 정의된 블록을 기준으로 상위 스코프의 값이 사용됨
+
+2. 렉시컬 환경
+  - 전체 문서, 함수, 블록을 실행하기 전 만들어지는 내부 객체
+  - 각 스코프의 고유 값들과 외부 스코프에 대한 참조를 포함
+### 구성요소
+  - 환경 레코드 - 해당 스코프의 데이터들
+  - 외부 렉시컬 환경에 대한 참조
+
+3. 클로저
+  - 내부 함수에서 외부 함수의 값에 접근할 수 있다는 개념
+```js
+function func1 () {
+  const word = 'Hello';
+
+  function func2 () {
+    console.log(word);
+  }
+  
+  return func2;
+}
+
+const logHello = func1();
+
+logHello();
+// Hello
+```
+- `logHello`에는 `func1` 안의 함수인 `func2`가 반환되어 지정됨
+- `func1`의 실행이 끝났음에도 불구하고, 해당 스코프 내의 값이 살아있음
+- `func2`와 `func2`가 선언된 환경의 조합: 클로져
+
+## this의 동적 바인딩
+1. 전역에서의 `this`
+```js
+console.log(this);
+```
+- 브라우저의 콘솔창: `window`객체
+- Node.js의 REPL: `global`객체
+- `.js`문서로 작성 후 실행 - 빈 객체
+  - Node.js에서 각 `.js`문서들은 모듈로서 실행되기 때문
+
+2. 함수에서의 `this`
+```js
+function func () {
+  console.log(this); // globalThis
+}
+
+func();
+
+function func () {
+  console.log(this); // globalThis
+}
+
+func(); //undifined
+```
+- 객체에 속하지 않은 함수에서는 `this`사용이 의미 없음
+
+3. 객체 안에서의 `this`
+```js
+// 객체 리터럴 - 해당 객체를 가리킴
+const obj = {
+  x: 123,
+  getX: function () {
+    return this.x;
+  }
+}
+
+console.log(obj.getX()); //123
+
+// 생성자 함수 - 생성될 인스턴스를 가리킴
+function Person (name, age) {
+  this.name = name;
+  this.age = age;
+  this.introduce = function  () {
+    return `저는 ${this.name}, ${this.age}세입니다.`
+  }
+}
+
+console.log(
+  new Person('홍길동', 20).introduce()
+);
+// 저는 홍길동, 20세입니다.
+
+// 클래스 선언 - 생성될 인스턴스를 가리킴
+class YalcoChicken {
+  constructor (name, no) {
+    this.name = name;
+    this.no = no;
+  }
+  introduce () {
+    return `안녕하세요, ${this.no}호 ${this.name}점입니다!`;
+  }
+}
+
+console.log(
+  new YalcoChicken('강남', 17).introduce()
+);
+// 안녕하세요 17호 강남점입니다!
+```
+
+2. 동적 바인딩
+  - 자바스크립트의 독특한 동작방식
+  - `this`가 가리키는 대상이 함수의 호출 주체 또는 그 방식에 따라 달라짐
+```js
+const korean = {
+  favorite: '김치',
+  makeStew: function (isHot, pots) {
+    return `${isHot ? '매운' : '순한'} ${this.favorite}찌개 ${pots}냄비`;
+  }
+};
+
+const italian = {
+  favorite: '피자'
+};
+
+console.log(
+  korean.makeStew(true, 1)
+); // 매운 김치찌개 1냄비
+
+// 이탈리아인에게 한국인이 찌개 끓이는 법을 알려줌
+italian.makeStew = korean.makeStew;
+
+console.log(
+  italian.makeStew(false, 2)
+); // 순한 피자찌개 2냄비
+
+// this가 가리키는 객체가 korean에서 italian으로 바뀌어 버림
+```
+### 해결방법들
+1. `call`을 사용한 함수 호출
+```js
+console.log(
+  italian.makeStew.call(korean, false, 2)
+);
+```
+
+2. `apply`을 사용한 함수 호출
+```js
+console.log(
+  italian.makeStew.apply(korean, [false, 2])
+);
+```
+
+3. :star: `bind`를 사용한 `this` 대상 고정
+  - `this`의 대상이 동적으로 변하지 않는 함수를 반환
+```js
+// ⭐ this가 바인딩된 새 함수를 만듦
+italian.makeRightStew = korean.makeStew.bind(korean);
+
+console.log(
+  italian.makeRightStew(false, 2)
+);// 순한 김치찌개 2냄비
+
+// 💡 추가 인자들까지 바인딩 가능 
+italian.makeClassicStew = korean.makeStew.bind(korean, true, 1);
+
+console.log(
+  italian.makeClassicStew()
+); // 매운 김치찌개 1냄비
+```
+
+4. 바인딩된 함수를 내보내는 함수
+```js
+const korean = {
+  favorite: '김치',
+  makeStew: function (isHot, pots) {
+    return `${isHot ? '매운' : '순한'} ${this.favorite}찌개 ${pots}냄비`;
+  },
+  teachMakingStew: function () {
+    return this.makeStew.bind(this);
+  }
+};
+
+const italian = {
+  favorite: '피자'
+};
+
+italian.makeStew = korean.teachMakingStew();
+
+console.log(
+  italian.makeStew(false, 2)
+); // 순한 김치찌개 2냄비
+```
+
+5. 생성자 함수일 경우 - 함수 자체를 미리 인스턴스에 바인딩하기
+```js
+function Korean () {
+  this.favorite = '김치';
+  this.makeStew = function (isHot, pots) {
+    return `${isHot ? '매운' : '순한'} ${this.favorite}찌개 ${pots}냄비`;
+  };
+
+  // 💡 여기서 바인딩을 고정시켜버림
+  this.makeStew = this.makeStew.bind(this);
+}
+
+function Italian () {
+  this.favorite = '피자';
+}
+
+const korean = new Korean();
+const italian = new Italian();
+
+italian.makeStew = korean.makeStew;
+
+console.log(
+  italian.makeStew(false, 2)
+);// 순한 김치찌개 2냄비
+
+// 임의로 특수한 동작을 시킬 때
+// call함수 첫번째인자에 임의 객체를 전달한다.
+console.log(
+  korean.makeStew.call({favorite = '된장'}, true, 2);
+); // 매운 된장찌개 2냄비
+```
+
+### :star: 배열 메서드의 `thisArg`
+- 콜백으로 주어진 함수 내에서 `this`가 가리킬 대상
+- 보통 콜백함수 다음 인자로 넣음
+```js
+function recommendForYou (me) {
+  const products = [
+    { sex: 'F', size: 'M' },
+    { sex: 'M', size: 'L' },
+    { sex: 'F', size: 'M' },
+    { sex: 'U', size: 'S' },
+    { sex: 'M', size: 'L' },
+    { sex: 'F', size: 'S' },
+  ];
+
+  products
+  .map((itm, idx) => {
+    return { ...itm, idx } 
+  })
+
+  // ⚠️ 화살표 함수 대신 function 선언 함수 사용 주목
+  // this가 객체 me를 바라봄
+  .filter(function ({sex, size}) {
+    return ['U', this.sex].includes(sex)
+    && size === this.size
+  }, me) // 💡 thisArg
+
+  .forEach(function ({idx}) {
+    console.log(`${this.name}님, ${++idx}번은 어떠세요?`);
+  }, me); // 💡 thisArg
+}
+
+const peter = {
+  name: '피터',
+  sex: 'M',
+  size: 'L'
+};
+
+const jane = {
+  name: '제인',
+  sex: 'F',
+  size: 'S'
+};
+
+recommendForYou(peter);
+recommendForYou(jane);
+```
+## this의 정적 바인딩(화살표 함수의 this)
+### 객체의 메서드 종류별 비교
+```js
+const obj = {
+  // function 선언 함수
+  func1: function () { return true; },
+
+  // 메서드
+  func2 () { return true; },
+
+  // 화살표 함수
+  func3: () => true
+}
+
+console.log(
+  obj.func1(), // true
+  obj.func2(), // true
+  obj.func3()  // true
+);
+
+console.log(obj.func1);
+console.log(obj.func2);
+console.log(obj.func3);
+
+const func1 = new obj.func1(); // 함수 - 인스턴스 생성
+const func2 = new obj.func2(); // 메소드 - 오류(생성자가 아님)
+const func3 = new obj.func3(); // 화살표 함수 - 오류(생성자가 아님)
+```
+
+### :star: 화살표 함수와 `this`
+  - `function` 함수나 메서드의 동적 바인딩과 다르게 동작
+  - 함수가 어디서 선언되었는가에 따라 다름 - 가장 근접한 상위 스코프에 바인딩 고정
+  - 즉 `this`를 정적으로 바인딩함
+1. 객체 리터럴에서
+  - 객체 리터럴의 화살표 함수는 가리키는 기본 스코프가 나머지 둘과 다름
+```js
+const obj = {
+  x: 1,
+  y: 2,
+
+  func1: function () {
+    console.log('1.', this);
+  },
+  func2 () {
+    console.log('2.', this);
+  },
+  func3: () => {
+    console.log('3.', this);
+  }
+}
+
+// this가 해당 객체를 가리킴
+obj.func1();
+obj.func2();
+
+// 💡 this가 상위 스코프를 가리킴
+obj.func3();
+
+const outer = {
+  a: true,
+  b: false,
+
+  func: function () {
+    const inner = {
+      x: 1,
+      y: 2,
+
+      func1: function () {
+        console.log('1.', this);
+      },
+      func2 () {
+        console.log('2.', this);
+      },
+      func3: () => {
+        console.log('3.', this);
+      }
+    }
+
+    // this가 inner를 가리킴 
+    inner.func1();
+    inner.func2();
+
+    // this가 outer를 가리킴
+    inner.func3();
+  }
+}
+
+outer.func();
+```
+
+2. 생성자 함수와 클래스에서
+  - 기본적으로는 가리키는 대상이 동일(해당 인스턴스)
+* :star: 동적으로 바인딩하는 타 방식과의 차이 확인
+```js
+function Korean () {
+  this.favorite = '김치';
+
+  this.makeStew = function (isHot) {
+    return `${isHot ? '매운' : '순한'} ${this.favorite}찌개`;
+  };
+  this.fryRice = (isHot) => {
+    return `${isHot ? '매운' : '순한'} ${this.favorite}볶음밥`;
+  };
+}
+
+function Italian () {
+  this.favorite = '피자';
+}
+
+const korean = new Korean();
+const italian = new Italian();
+
+console.log(korean.makeStew(true)); // 매운 김치찌개
+console.log(korean.fryRice(true)); // 매운 김치볶음밥
+
+italian.makeStew = korean.makeStew;
+italian.fryRice = korean.fryRice;
+
+console.log(italian.makeStew(false)); // 순한 피자찌개
+console.log(italian.fryRice(false));  // 매운 김치볶음밥(정적 바인딩)
+```
+- 클래스도 마찬가지
