@@ -1143,3 +1143,227 @@ console.log(italian.makeStew(false)); // 순한 피자찌개
 console.log(italian.fryRice(false));  // 매운 김치볶음밥(정적 바인딩)
 ```
 - 클래스도 마찬가지
+
+# 프로토타입
+## 프로토타입의 개념
+1. 프로토타입
+- 자바스크립트는 프로토타입 기반의 객체지향 프로그래밍을 지원하는 언어
+- 오늘날에는 클래스가 더 널리 사용되지만, 사용하기에 따라 보다 강력하고 효율적
+
+### :star: 자바스크립트의 모든 객체는 `Prototype`을 가짐
+```js
+const obj = {};
+
+console.log(obj); 
+// [[Prototype]]이 존재
+// 프로토타입에 존재하는 메소드들은 빈 객체도 사용할 수 있다.
+```
+2. `Object` - 모든 것의 조상
+- 아래 각 객체의 `[[Prototype]]`의 `[[Prototype]]`이 `Object`임
+- 프로토타입 체인
+  - 특정 객체에 호출된 프로퍼티가 없다면 프로토타입을 거슬러 올라감
+  - ex) 배열에는 `valueOf`가 없지만 그 프로토타입인 `Object`에는 존재하므로 호출 가능(프로토타입 상속)
+
+3. 코드로 프로토타입에 접근하기
+- `Object.getPrototypeOf`
+  - 수정할 때는 `Object.setPrototypeOf` 사용
+
+```js
+console.log(
+  Object.getPrototypeOf({})
+);
+```
+- :star: 생성자 함수에서는 `prototype`으로 프로토타입 접근 가능
+```js
+function Person (name) {
+  this.name = name;
+}
+
+// 인스턴스들에 공유될 프로토타입에 다음과 같이 접근
+console.log(Person.prototype);
+
+// 생성자 함수로 동작하지 않는 빌트인 객체는 undifined
+console.log(
+  Math.prototype
+);
+```
+4. 인스턴스 vs 프로토타입 프로퍼티
+```js
+function YalcoChicken (name, no) {
+  this.name = name;
+  this.no = no;
+}
+
+// 공통된 요소들은 프로토타입 프로퍼티로
+YalcoChicken.prototype.titleEng = 'YalcoChicken';
+
+YalcoChicken.prototype.introduce = function () {
+  return `안녕하세요, ${this.no}호 ${this.name}점입니다!`;
+}
+
+YalcoChicken.prototype.introEng = function () {
+  return `Welcome to ${this.titleEng} at ${this.name}!`;
+};
+
+const chain1 = new YalcoChicken('판교', 3);
+const chain2 = new YalcoChicken('강남', 17);
+const chain3 = new YalcoChicken('제주', 24);
+
+console.log(chain1.introduce());
+console.log(chain1.introEng());
+
+// 프로토타입 레벨의 함수를 인스턴스 레벨에서 덮어쓰기 가능(오버라이딩)
+const chain4 = new YalcoChicken('평양', 456);
+chain4.introduce = function () {
+  return `어서오시라요, ${this.no}호 ${this.name}점입네다!`;
+}
+
+console.log(chain4.introduce());
+```
+## 프로토타입과 상속
+1. 프로토타입으로 상속하기
+- `Object.create` 메서드: 주어진 것을 프로토타입으로 갖는 객체 생성
+```js
+function Bird (name, sound) {
+  this.name = name;
+  this.sound = sound;
+}
+Bird.prototype.fly = function () {
+  console.log(`${this.name} ${this.sound} 비행중`);
+}
+
+function Eagle (name, sound, prey) {
+  this.name = name;
+  this.sound = sound;
+  this.prey = prey;
+}
+
+// ⚠️ 순서 주의! 상속을 먼저 받음
+Eagle.prototype = Object.create(Bird.prototype);
+// Eagle.prototype = Bird.prototype; // 💡 비교해 볼 것, 상속이 아닌 같은 레벨의 클래스가 되어버림
+
+// 상속 이후 자신의 프로토타입 작성
+Eagle.prototype.hunt = function () {
+  console.log(`${this.name} ${this.prey} 사냥중`);
+}
+```
+2. 부모의 생성자 활용하기
+- 생성자에서 중복되는 부분 위임
+- `class`에서는 `contructor`에서 `super`사용
+```js
+function Bird (name, sound) {
+  this.name = name;
+  this.sound = sound;
+}
+Bird.prototype.fly = function () {
+  console.log(`${this.name} ${this.sound} 비행중`);
+}
+
+function Eagle (name, sound, prey) {
+  // 💡 call 호출방식 사용
+  Bird.call(this, name, sound); // this는 Eagle의 인스턴스
+  this.prey = prey
+}
+
+Eagle.prototype = Object.create(Bird.prototype);
+
+Eagle.prototype.hunt = function () {
+  console.log(`${this.name} ${this.prey} 사냥중`);
+}
+
+const eagle = new Eagle('독돌이', '푸드덕', '토끼');
+console.log(eagle);
+
+eagle.fly();
+eagle.hunt();
+```
+3. 클래스로 구현
+### :star: 클래스 역시 프로토타입을 기반으로 구현됨
+- 클래스와 프로토타입
+  - 클래스의 메서드는 프로토타입으로 들어가게됨
+  - `extends`-프로토타입 상속도를 만듦
+```js
+class Bird {
+  constructor (name, sound) {
+    this.name = name;
+    this.sound = sound;
+  }
+  // 메소드, 프로토타입
+  fly () {
+    console.log(`${this.name} ${this.sound} 비행중`);
+  }
+}
+
+class Eagle extends Bird {
+  constructor (name, sound, prey) {
+    super(name, sound);
+    this.prey = prey;
+  }
+  // 프로토타입
+  hunt () {
+    console.log(`${this.name} ${this.prey} 사냥중`);
+  }
+}
+
+const bird = new Bird('새돌이', '파닥파닥');
+const eagle = new Eagle('독돌이', '푸드덕', '토끼');
+
+console.log(bird);
+console.log(eagle);
+```
+4. Mixin - `Object.assign`으로 조립하기
+- 상속 - 한 부모로부터만 물려받음
+- 믹스인 - 여럿을 조합하여 가져올 수 있음
+```js
+const runner = {
+  run : function () {
+    console.log(`${this.name} 질주중`);
+  }
+}
+const swimmer = {
+  swim: function () {
+    console.log(`${this.name} 수영중`);
+  }
+}
+const flyer = {
+  fly: function () {
+    console.log(`${this.name} 비행중`);
+  }
+}
+const hunter = {
+  hunt: function () {
+    console.log(`${this.name} 사냥중`);
+  }
+}
+
+class Owl {
+  constructor (name) {
+    this.name = name;
+  }
+}
+
+class FlyingFish {
+  constructor (name) {
+    this.name = name;
+  }
+}
+
+class PolarBear {
+  constructor (name) {
+    this.name = name;
+  }
+}
+
+// 여러가지 조합의 객체를 프로토타입으로 설정
+Object.assign(Owl.prototype, flyer, hunter);
+Object.assign(FlyingFish.prototype, flyer, swimmer);
+Object.assign(PolarBear.prototype, runner, swimmer, hunter);
+
+const owl = new Owl('붱돌이');
+const f_fish = new FlyingFish('날치기');
+const p_bear = new PolarBear('극곰이');
+
+console.log(owl);
+console.log(f_fish);
+console.log(p_bear);
+```
