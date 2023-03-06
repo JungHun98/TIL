@@ -1367,3 +1367,223 @@ console.log(owl);
 console.log(f_fish);
 console.log(p_bear);
 ```
+
+# 비동기 프로그래밍
+## 비동기의 개념과 타임아웃
+## 프로미스
+### 콜백 지옥(callback hell)
+```js
+setTimeout(() => {
+  console.log(1);
+  setTimeout(() => {
+    console.log(2);
+      setTimeout(() => {
+        console.log(3);
+        setTimeout(() => {
+          console.log(4);
+          setTimeout(() => {
+            console.log(5);
+          }, 500);
+        }, 500);
+      }, 500);
+  }, 500);
+}, 500);
+```
+- 연속적으로 비동기 코드를 써야 하는 경우
+- 위와 같이 콜백 함수 안에 또 다른 콜백 함수를 널어야 하는 상황 발생 - 콜백지옥
+- 실전에서는 더더욱 복잡하고 난해해짐
+### 프로미스
+- 어떤 과정 이후 주어진 동작을 실행할 것이란 약속
+- 중첩된 비동기 코드를 직관적이고 연속적인 코드로 작성할 수 있도록 함
+```js
+const borrow = 20;
+
+// 빌린 돈의 10%를 더해 값겠다는 약속
+// reject는 지금 사용하지 않음(실패했을 때 반환 할 값)
+// resolve-프로미스가 성공했을 때 반환 할 값을 넣어줌
+const payWith10perc = new Promise((resolve, reject) => {
+  resolve(borrow * 1.1);
+});
+
+// then.. => 프로미스 반환
+// "프로미스가 성공했을 때" 반환 받을 값을 인자(result)로 하는 함수를 실행
+// resolve에서 받은 값을 활용해 어떤 행동을 한다.
+payWith10perc
+.then(result => {
+  console.log(result + '만원');
+});
+```
+```js
+const borrow = 20;
+
+const payWith10perc = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    if (Math.random() < 0.5) {
+      // 💡 돈을 값을 수 없게 되었을 때
+      reject('사업 망함'); // 보통 실패사유나 관련 설명을 넣음
+    }
+    resolve(borrow * 1.1);
+  }, 1000); // 1초 후 갚겠음
+});
+
+payWith10perc
+.then(result => {
+  console.log(result + '만원');
+}
+// 💡 두 번째 인자로 reject를 받는 콜백을 넣을 수 있지만
+// 아래처럼 catch로 진행하는 것이 더 깔끔함
+)
+.catch(msg => {
+  console.error(msg);
+})
+.finally(() => {
+  console.log('기한 종료');
+});
+```
+## 프로미스의 병렬 진행
+- 여러 프로미스를 병령 처리하기 위한 Promise의 정적 메서드들
+```js
+// 다섯 주자들이 동시에 질주
+// 데드라인(밀리초) 안에 들어오지 못하면 탈락
+let DEADLINE = 1450;
+
+function getRunPromise (name) {
+  return new Promise((resolve, reject) => {
+    const time = 1000 + Math.random() * 500;
+
+    setTimeout(() => {
+      if (time < DEADLINE) {
+        console.log(`🚩 ${name} 도착 - ${(time)/1000}초`);
+        resolve({name, time});
+
+      } else {
+        reject((`${name} 시간초과`));
+      }
+    }, time);
+  });
+}
+
+console.log(
+  '철수,영희,돌준,정아,길돈'
+  .split(',')
+  .map(getRunPromise)
+);
+```
+1. `all`
+  - 프로미스의 배열을 인자로 받아 동시에 진행
+  - 모두 성공하면 `resolve`된 값들을 배열로 반환 - then으로 받음
+  - 하나라도 실패하면 `catch`실행
+  ```js
+  // 한 명이라도 탈락하면 전체 탈락
+  Promise.all(
+    '철수,영희,돌준,정아,길돈'
+    .split(',')
+    .map(getRunPromise)
+  )
+  .then(console.log)
+  .catch(console.error)
+  .finally(() => {
+    console.log('- - 경기 종료 - -');
+  });
+  ```
+2. allSettled
+  - 주어진 프로미스들의 결과를 배열로 출력
+  - 실패 유무 관계없이 `then`으로 배열 반환
+  ```js
+  Promise.allSettled(
+    '철수,영희,돌준,정아,길돈'
+    .split(',')
+    .map(getRunPromise)
+  )
+  .then(console.log)
+  // ⚠️ catch는 동작하지 않음
+  .finally(() => {
+    console.log('- - 경기 종료 - -');
+  });
+  ```
+3. `any`
+  - 가장 먼저 성공한 프로미스의 결과를 `then`으로 반환
+  ```js
+  Promise.any(
+    '철수,영희,돌준,정아,길돈'
+    .split(',')
+    .map(getRunPromise)
+  )
+  .then(console.log)
+  // ⚠️ 모두 실패해도 catch는 동작하지 않음
+  .finally(() => {
+    console.log('- - 경기 종료 - -');
+  });
+  ```
+4. `race`
+  - 성공이든 실패든 첫 결과물을 `then` 또는 `catch`로 반환
+  ```js
+  Promise.race(
+    '철수,영희,돌준,정아,길돈'
+    .split(',')
+    .map(getBombRunPromise)
+  )
+  .then(console.log)
+  .catch(console.error)
+  .finally(() => {
+    console.log('- - 경기 종료 - -');
+  });
+  ```
+## async & await
+### `async` 함수
+- 프로미스를 기반으로 동작
+- 마치 동기 코드처럼 직관적으로 코딩 할 수 있음
+```js
+function getMult10Promise (number) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(number * 10);
+    }, 1000);
+  });
+}
+
+async function doAsyncWorks () {
+  // 비동기 작업들이 동기적으로 효현됨
+  // await - 프로미스의 결과를 받을 때 까지 기다려
+  const result1 = await getMult10Promise(1);
+  console.log(result1);
+
+  const result2 = await getMult10Promise(2);
+  console.log(result2);
+
+  const result3 = await getMult10Promise(3);
+  console.log(result3);
+}
+
+doAsyncWorks();
+console.log('💡 이 문구가 먼저 출력됨'); // 비동기 작업이기 때문에 console.log가 먼저 출력됨
+```
+- `await` - 코드의 진행을 멈추고 프로미스로부터 답을 받아냄
+- `await`은 `async` 함수 또는 모듈 내에서만 사용 가능
+  ```js
+  async function doAsyncWorks () { /* ...  */ }
+  ```
+## 네트워크 통신에서의 활용
+1. Fetch API
+  - Web API에서 제공하는 기능
+  - 네트워크 통신으로 원격에 요청을 보내고 답을 받아오는 프로미스를 반환
+  - 네크워크로부터 리소스를 받아오기 위한 다양하고 강력한 기능들 제공
+  - 어떤 웹 페이지가 열린 상태에서 그곳에서 사용될 추가적인 데이터를 서버로부터 요청해올 때 새로고침 없이 새로운 데이터를 받아올 수 있음
+  - 필요에 따라 추가적인 요청을 보내 받은 데이터를 바탕으로 웹 페이지를 업데이트하는 기술 - ajax
+  ```js
+  // 💡 결과가 Promise의 인스턴스임 확인
+  console.log(
+    fetch('https://showcases.yalco.kr/javascript/mockserver/race-result')
+  );
+
+  fetch('https://showcases.yalco.kr/javascript/mockserver/race-result')
+  .then(response => {
+    console.log(response);
+    return response;
+  })
+  .then(response => response.json())
+  .then(console.log);
+  ```
+  - 반환되는 결과 (response)
+    - 요청의 결과에 대한 정보들을 담은 객체
+    - `json`메서드 - 결과의 body로 받은 텍스트를 JSON으로 변환하여 반환
