@@ -1587,3 +1587,427 @@ console.log('💡 이 문구가 먼저 출력됨'); // 비동기 작업이기 �
   - 반환되는 결과 (response)
     - 요청의 결과에 대한 정보들을 담은 객체
     - `json`메서드 - 결과의 body로 받은 텍스트를 JSON으로 변환하여 반환
+
+# 코드파일 다루기
+## HTML에 불러오는 방법들
+1. 헤드에 스크립트로 로드
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <title>제대로 파는 자바스크립트</title>
+  <script src="./script.js"></script>
+</head>
+<body>
+  <span>변경 전...</span>
+</body>
+</html>
+```
+- html 문서는 위에서 아래로 파싱됨
+- js파일이 로드되고 실행될 때는 아직 `body` 부분이 로드되지 않음
+- 스크립트의 크기가 클 경우 그 아래 요소들의 로드가 지연됨
+
+2. body 요소들 아래에 로드
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <title>제대로 파는 자바스크립트</title>
+</head>
+<body>
+  <span>변경 전...</span>
+  <script src="./script.js"></script>
+</body>
+</html>
+```
+- 스크립트가 마지막에 로드
+
+3. onload 이벤트 사용
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <title>제대로 파는 자바스크립트</title>
+  <script src="./script.js"></script>
+</head>
+<body>
+  <span>변경 전...</span>
+</body>
+</html>
+```
+```js
+window.onload = function () {
+  document.querySelector('span').innerText = '텍스트 변경됨';
+}
+```
+- 스크립트를 실행하기 위한 onload 이벤트 등록필요
+- 문서의 동기적 로드 문제 여전함
+
+4. async/defer 로드 - 비동기로드
+- HTML을 파싱하는 도중 js파일을 로드
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <title>제대로 파는 자바스크립트</title>
+
+  <script async src="./script1.js"></script>
+  <script defer src="./script2.js"></script>
+</head>
+<body>
+  <span>변경 전...</span>
+</body>
+</html>
+```
+```js
+document.querySelector('span').innerText = '텍스트 변경됨';
+```
+- async 방식은 js파일이 모두 로드된 시점에 js 파일을 바로 실행한다.
+- :star: `defer`방식은 HTML 파싱하고 있는 동시에 js파일을 비동기적으로 로드하고, HTML의 파싱이 완료된 후에 js파일을 실행한다.
+
+## 모듈과 라이브러리
+### 페이지에 자바스크립트 파일을 여럿 로드할 때 문제점들
+1. 네임스페이스 문제
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <title>제대로 파는 자바스크립트</title>
+  <script defer src="./script1.js"></script>
+  <script defer src="./script2.js"></script>
+</head>
+<body>
+</body>
+</html>
+```
+```js
+// script1
+const x = 1;
+
+console.log(x);
+```
+```js
+// script2
+const x = 2;
+
+console.log(x);
+```
+- 같은 상수나 변수명이 둘 이상의 파일에서 사용되었으므로 오류 발생
+  - HTML에서 js를 여려개 로드해서 사용할 때 식별자들의 공간이 공유되기 때문
+- 다른 파일에 상수/변수명이나 함수명이 중복 사용되지 않았는지 확인해야 함
+- 규모가 큰 웹페이지를 분업하여 만들 때 특히 큰 어려움
+
+2. 파일의 순서 문제
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <title>제대로 파는 자바스크립트</title>
+  <script defer src="./script1.js"></script>
+  <script defer src="./script2.js"></script>
+</head>
+<body>
+</body>
+</html>
+```
+```js
+// script1
+const x = 1;
+
+console.log(x);
+```
+```js
+// script2
+const y = 2;
+
+console.log(x, y);
+```
+- HTML에서 로드하는 js파일의 순서가 바뀐다면 오류발생
+- 다른 파일의 코드가 필요할 경우 순서에 의존적임
+- 한 파일의 코드가 다른 파일의 변수에 영향을 미칠 수 있음
+- 결국 큰 하나의 `js`파일을 나눠 작성하는 것에 불과함
+
+### 모듈 사용하기
+1. 기본 사용법
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <title>제대로 파는 자바스크립트</title>
+
+  <!-- 💡 모듈로서 로드 -->
+  <script type="module" src="./main.js"></script>
+</head>
+<body>
+  <script>
+    console.log('모듈은 defer 방식으로 로드됩니다.');
+  </script>
+</body>
+</html>
+```
+- 모듈로서 로드할 파일에는 `type="module"`속성을 넣어줌
+- 모듈은 자동으로 `defer`로 로드됨
+- 실행코드가 들어있는 파일만 로드하면 됨
+
+```js
+// module1.js
+export const x = 1;
+export const y = 2;
+
+export const person = {
+  name: '홍길동',
+  age: 20
+}
+```
+:star: `export`
+- 따라오는 식별자를 다른 모듈에서 사용할 수 있도록 공개함
+  - 다른 모듈에서 사용하려면 `import`해줘야 함
+- 상수, 변수, 함수, 클래스 모두 export가능
+
+```js
+// main.js
+import { x, y, person } from './module1.js';
+
+console.log(x, y);
+console.log(person);
+```
+:star: `import`
+- 타 모듈에서 공개한 식별자를 자신의 스코프로 로드
+- 모듈의 요소들을 객체 디스트럭처링 방식으로 가져올 수 있음
+
+```js
+import { 
+  x as a,
+  y as b,
+  person as individual
+} from './module1.js';
+
+console.log(a, b);
+console.log(individual);
+```
+- 위와 같이 원하는 이름으로 바꾸어 가져올 수 있음
+
+2. 여러 모듈 가져와 사용하기
+```js
+// 💡 필요한 것만 선별하여 가져오기
+import { x, y } from './module1.js';
+import { add, mult } from './module2.js';
+import { Eagle } from './module3.js';
+
+console.log(
+  add(x, y), mult(x, y)
+);
+
+const eagle = new Eagle('독돌이', '푸드덕', '토끼');
+eagle.hunt();
+```
+
+3. 하나의 모듈 객체로 묶어서 가져오기
+```js
+import * as funcs from './module4.js';
+// module4에서 export된 모든 것을 funcs라는 객체로 import하겠다
+
+// 💡 로그 살펴볼 것!
+console.log(funcs);
+
+funcs.logResult(
+  [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  .filter(funcs.isOdd)
+  .map(funcs.square)
+  .join(', ')
+);
+```
+
+4. 이름없는 하나의 값으로 반환하기
+```js
+// 💡 default를 사용하면 let, const 사용 불가
+// 식별자 사용불가
+export default {
+  x: 1,
+  arry: [1, 2, 3, 4, 5],
+  obj: {
+    a: true,
+    b: false
+  },
+  isEven: x => !(x % 2),
+};
+```
+- 한 모듈에서 하나만 사용가능
+- 일반적으로 특정 줒의 기능들을 하나의 객체로 담아 공개
+```js
+import mod5 from './module5.js';
+
+console.log(mod5);
+
+console.log(
+  mod5.arry
+  .filter(mod5.isEven)
+  .join(', ')
+);
+```
+- `default`로 공개된 것을 `import`할 때는 `{}`로 감싸지 않음
+
+5. 모듈에서는 `awit`을 바로 사용 가능
+```js
+// async를 사용하지 않아도 사용가능
+// 모듈은 async에 감싸진채 실행
+const raceResults = await fetch(
+  'https://showcases.yalco.kr/javascript/mockserver/race-result'
+)
+.then(response => response.json())
+
+console.log(raceResults);
+```
+:star: 외부 라이브러리 로드
+```js
+import Big from 'https://unpkg.com/big.js@6.2.1/big.mjs';
+// mjs => module js
+console.log(Big);
+```
+## 웹팩과 바벨
+### 1. 웹팩
+- 번들러 - 다수의 파일을 소수의 파일로 압축
+- 어플리케이션이 로딩 및 실행 속도 향상
+- 각종 플러그인과 옵션을 사용하여 코드를 다양한 방법으로 변환/압축 가능
+
+### :star: 프로젝트에 사용해보기
+
+0. 소스 저장소 분리하기
+- `src` 폴더 만들고 `.js`파일을 모두 이동
+1. 프로젝트에 웹팩 설치
+```
+npm install webpack webpack-cli --save-dev
+```
+2. 웹팩 설정 파일
+```js
+// webpack.config.js
+const path = require('path');
+
+module.exports = {
+  entry: './src/main.js',
+  // 이 파일을 기준으로 포함된 모든 파일들을 입력으로 압축해서
+  output: {
+    filename: 'main.js',
+    // 여기에 출력한다
+    path: path.resolve(__dirname, 'dist'),
+  },
+
+  // 💡 추가설정들
+  watch: true, // 파일 수정 후 저장시 자동으로 다시 빌드
+  experiments: {
+    topLevelAwait: true // 모듈 await 가능하도록
+  }
+};
+```
+- `./src/main.js`파일과 연결된 모든 모듈들을 `./dist/main.js`파일로 통합
+
+3. 빌드 명령 추가
+```js
+// package.json
+  "scripts": {
+    "build": "webpack"
+  },
+```
+- 웹팩으로 빌드할 때 `"type":"module"`을 지워주어야 함
+4. 빌드 및 실행
+```
+npm run build
+```
+- `./dist/main.js`파일 확인
+- HTML파일에서 `script`의 `src`를 `./dist/main.js`로 변경
+
+### 2. 바벨
+- 자바스크립트를 보다 오래된 환경에서 동작할 수 있는 버전으로 컴파일
+- 기타: 타입스크립트에서 컴파일러 사용
+
+## JSDoc
+- 자바스크립트 코드에 주석을 달기 위한 마크업 언어
+  - 객체, 함수, 변수에 대한 설명
+- 에디터, IDE에서는 작성된 내용에 따라 코드 힌팅 등의 기능 제공
+- 마치 타입스크립트 등의 언어처럼 인자 등의 자료형 제안
+- 도구를 통해 웹 문서 등으로 출력될 수 있음
+- `.js`파일에서 `/**`을 입력하면 사용 가능
+### 기본 주석
+```js
+/** 코드의 제목으로 사용될 문자열 */
+const TITLE = 'JSDoc 사용하기';
+```
+### `@type`-자료형 명시, `@const`-상수임을 명시
+```js
+/**
+ * 원주율
+ * @type {number}
+ * @const
+ */
+
+/**
+ * 원주율
+ * @const {number}
+ */
+const PI = '3.14';
+```
+### `@param`-인자
+```js
+/**
+ * 
+ * @param {number} x 
+ * @param {number} y 
+ * @returns {number} 두 수의 합
+ */
+const add = (x, y) => x + y;
+```
+### `@typedef`, `@property` - 커스텀 객체 타입 지정
+```js
+/**
+ * @typedef {Object} PersonObj 사람 객체
+ * @property {string} name 이름
+ * @property {number} age 나이
+ * @property {boolean} married 기혼여부
+ */
+
+/**
+ * 
+ * @param {string} name 이름
+ * @param {number} age 나이
+ * @param {boolean} married 기혼여부
+ * @returns {PersonObj}
+ */
+function getPersonObj (name, age, married) {
+  return {name, age, married}
+}
+```
+### `@constructor`, `@class`-생성자 용도로 작성된 함수, 클래스
+- `new`키워드와 함께 사용하여 객체를 생성함
+- 클래스의 생성자에는 `@constructs`
+```js
+/**
+ * 사람 객체 생성 함수
+ * @constructor 
+ * @param {string} name 
+ * @param {number} age 
+ */
+function Person (name, age) {
+  this.name = name;
+  this.age = age;
+}
+
+/**
+ * 새 클래스
+ * @class
+ */
+class Bird {
+  /**
+   * @constructs
+   * @param {string} name 
+   */
+  constructor (name) {
+    this.name = name;
+ }
+}
+``` 
+
+### `@todo`-이후 해야 할 일 표시
+### `@see`, `@link`-참조, 링크
+### `@readonly`-읽기 전용
+### `@deprecated`-사라지게 될 기능
