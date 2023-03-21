@@ -1,18 +1,27 @@
+# 재귀
+- 자신을 정의할 때 자기 자신을 참조하는 방법
+- Activation Record
+  - 함수의 실행 과정에서 현재의 상태를 저장하는 Block
+  - 각각의 함수 호출이 있을 때 마다 현재 상태를 `스택`에 저장 
+  - 호출 후 돌아갈 위치, 로컬 변수, 매개 변수들을 저장하고 있음
+
 # 트리(Tree)구조란?
 
-- 대표적인 비선형 자료구조.
+- 대표적인 비선형 자료구조. 큐나 스택과 달리 데이터가 삽입되는 순서가 중요하지 않다.
 - 데이터를 저장하고 있는 노드가 branch로 연결된 자료구조.
 - 트리는 하나의 root노드를 시작으로 나무가 뒤집힌 모양과 비슷하다.
+- 데이터를 저장하고 있는 node로 구성되어 있는 유한집합
 
   <p align = "center">
   <img src = "./img/Tree.png" width = 50%>
   </q>
+- subtree: 전체 트리의 부분 트리
 
 ## 트리의 종류
 
 1. Binary Tree(이진 트리)
 
-   - 각 node의 Child수가 최대 2개인 트리구조.
+   - 각 node의 Child수가 최대 2개인 트리구조. 본래 Tree는 child node 개수에 제한이 없다.
    - 이진트리에서도 Full Binary Tree와 Complete Binary Tree로 나뉨
      - Full Binary Tree
        - 모든 leaf node의 깊이가 같은 tree
@@ -23,7 +32,14 @@
        - 만약 깊이가 k라면 최소 2^k만큼의 노드가 존재한다.  
          ![](./img/complete.png)
      - Full Binary Tree는 Complete Binary Tree가 될 수 있지만 역은 성립하지 않을 수 있다.
+  - Complete Binary Tree는 배열에 저장할 수 있다. 배열에 저장하면 해당 노드의 부모 인덱스, 두 자식의 인덱스를 알 수 있다.
+    - 왼쪽 자식 인덱스: (i * 2) + 1
+    - 오른쪽 자식 인덱스: (i * 2) + 2
+    - 부모 노드 인덱스: (i - 1)/ 2
+  - 다른 일반 적인 이진 트리들은 배열로 표현하기 어렵기 때문에 node가 두 개의 node link field를 갖는다.
+    - 하나의 node는 data, left, right의 정보를 저장하고 있음
 
+    
 2. Binary Search Tree(이진 탐색 트리)
 
    - 이진 트리에서 데이터의 검색을 효율적으로 하기위한 트리.
