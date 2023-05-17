@@ -506,30 +506,32 @@ Content-Type: application/json
   - 결과 내용이 없어도 204 메시지만으로 성공을 인식할 수 있다.
 
 ## 3xx - 리다이렉션
-### 요청을 완료하기 위해 유저 에이전트의 추가 조치 필요
+### 요청을 완료하기 위해 유저 에이전트(클라이언트 프로그램)의 추가 조치 필요
 - 300 Multiple Choices
 - 301 Move Permanently
-- 302 Multiple Choices
-- 303 Multiple Choices
-- 304 Multiple Choices
-- 305 Multiple Choices
-- 306 Multiple Choices
-- 307 Multiple Choices
-- 308 Multiple Choices
+- 302 Found
+- 303 See Other
+- 304 Not Modified
+- 307 Temporary Redirect
+- 308 Permanent Redirect
+
 ### 리다이렉션
 - 웹 브라우저는 3xx응답의 결과에 Location 헤더가 있으면, URL을 Location 위치로 자동 이동
 - 자동 리다이렉트 흐름
   1. 클라이언트 - 서버로 리소스 접근 요청
-  2. 서버가 상태코드 3xx와 Locatio Header로 응답
+  2. 서버가 상태코드 `3xx`와 `Location Header`로 응답
   3. 자동 리다이렉트(URL 이동)
-  4. 클라이언트 - 서버로 새로운 리소스 요청
-  5. 서버가 응답
+  4. 클라이언트 - 서버로 새로운 URL 리소스 요청
+  5. 서버 응답
 - 리다이렉션 종류
   - 영구 리다이렉션: 특정 리소스의 URI가 영구적으로 이동
     - URI 변경
-  - 일시 리다이렉션: 일시적인 변경
+  
+  - 일시 리다이렉션: 특정 리소스의 URI가 일시적인 변경
     - 주문 완료 후 주문 내역 화면으로 이동
-  - 특수 리다이렉션: 결과 대신 캐시를 사용
+    - PRG pattern: Post/Redirect/Get 
+
+  - 특수 리다이렉션: 서버에서 응답 대신 캐시를 사용하도록 함
 
 ### 영구 리다이렉션 301/308
 - 리소스의 URI가 영구적으로 이동
@@ -539,13 +541,13 @@ Content-Type: application/json
   1. 클라이언트 - 서버로 리소스 요청
   2. 서버는 사용하지 않는 리소스임을 인지하고 301과 새로운 URL을 전송
   3. 자동 리다이렉트(URL) 이동
-  4. 클라이언트는 응답받은 리소스를 `GET`으로 요청(이 과정에서 메시지가 제거 될 수도 있다.)
+  4. 클라이언트는 응답받은 리소스를 `GET`으로 요청(이 과정에서 `POST`로 요청한 메시지가 제거 될 수도 있다.)
   5. 서버 응답
 - 308 Permanent Redirect
   - 301과 기능은 같음
-  - 리다이렉트 요청 메서드와 본문 유지(처음 POST를 보내면 리다이렉트도 POST)
+  - 리다이렉트 요청 **메서드와 본문 유지**(처음 POST를 보내면 리다이렉트도 POST 요청)
   1. 클라이언트 - 서버로 리소스 요청
-  2. 서버는 사용하지 않는 리소스임을 인지하고 301과 새로운 URL을 전송
+  2. 서버는 사용하지 않는 리소스임을 인지하고 308과 새로운 URL을 전송
   3. 자동 리다이렉트(URL) 이동
   4. 클라이언트는 응답받은 리소스를 요청 메소드와 메시지를 유지하고 다시 요청
   5. 서버 응답
@@ -557,25 +559,26 @@ Content-Type: application/json
   - 리다이렉트시 요청 메서드가 **GET**으로 변하고, 본문이 제거될 수 있음
 - 307 Temporary Redirect
   - 302와 기능은 같음
-  - 리다이렉트시 요청 메서드와 본문 유지(요청 메서드를 변경하면 안된다. MUST NOT)
+  - 리다이렉트시 **요청 메서드와 본문 유지**해야 함(요청 메서드를 변경하면 안된다. MUST NOT)
 - 303 See Other
   - 302와 기능은 같음
   - 리다이렉트시 요청 메서드가 **GET**으로 변경
-
-### PRG: Post/Redirect/Get
-- 일시적인 리다이렉션 - 예시
+### PRG Pattern: Post/Redirect/Get
+- 일시적인 리다이렉션 예시(POST의 중복 요청을 방지하기 위한 패턴)
 - POST로 주문후에 웹 브라우저를 새로고침하면?
-- 새로고침은 다시 요청(POST를 한 번 더)
-- 중복 주문이 될 수 있다.
+- 새로고침은 다시 요청 하는 것(POST를 한 번 더)
+- 따라서 중복 주문이 될 수 있다.
   1. POST로 주문 요청
   2. 주문데이터 저장
   3. 서버 응답, 200 OK
   4. 클라이언트에서 새로고침
   5. 같은 요청을 서버로 다시 보냄
   6. 요청 데이터 저장 -> 중복!!!
-    
+
+> 로그인 혹은 회원가입 후 메인 페이지로 리다이렉트 할 수 있겠다.
+
 - POST로 주문후에 새로 고침으로 인한 중복 주문 방지
-- POST로 주문후에 주문 결과 화면을 GET 메서드로 리다이렉트
+- **POST**로 주문후에 주문 결과 화면으로 **Redirect**후 결과 화면을 **GET**요청
 - 새로고침해도 결과 화면을 GET으로 조회
 - 중복 주문 대신에 결과 화면만 GET으로 다시 요청
 - 클라이언트 차원에서 먼저 막아줄 수 있다.
@@ -648,17 +651,18 @@ Content-Type: application/json
 
 # HTTP 헤더 - 일반 헤더
 ## HTTP 헤더 개요
-- `field-name ":" field-value `
+- header-field= `field-name ":" field-value `
 ### 용도
-- HTTP 전송에 필요한 모든 부가정보
+- HTTP 전송에 필요한 모든 부가정보를 담고 있음
   - 메시지 바디의 내용, 크기, 압축, 인증 등등..
 - 표준 헤더가 너무 많음
 - 필요시 임의의 헤더필더를 추가할 수 있음
+
 ### 분류(과거 폐기됨)
-- General 헤더: 메시지 전체에 적용되는 정보 예) `Connection: close`
-- Request 헤더: 요청 정보 예) `User-Agent: Mozilla/5.0`
-- Response 헤더: 응답 정보 예) `Server: Apache`
-- Entity 헤더: 엔티티 바디 정보 예) `Content-Type: text/html, Content-Length: 3423`
+- General 헤더: 메시지 전체에 적용되는 정보, 예) `Connection: close`
+- Request 헤더: 요청을 보낼 때 헤더에 포함되는 정보, 예) `User-Agent: Mozilla/5.0`
+- Response 헤더: 응답을 보낼 때 헤더에 포함되는 정보, 예) `Server: Apache`
+- Entity 헤더: 엔티티 바디 정보, 예) `Content-Type: text/html, Content-Length: 3423`
 
 ### HTTP Body(과거 폐기됨)
 - 메시지 본문은 엔티티 본문을 전달하는데 사용
@@ -667,26 +671,30 @@ Content-Type: application/json
    - 데이터 유형(html, json), 데이터 길이, 압축 정보 등등
 
 ### 현재는??(RFC723x)
-- Entity -> Representation
+- Entity -> Representation(표현)
 - Representation = Representation Matadata + Representation Data
+- 표현 = 표현에 대한 데이터 + 표현 데이터
 
 ### HTTP Body
 - 메시지 본문을 통해 표현 데이터 전달
-- 메시지 본문 = 페이로드(payload)
+- 메시지 본문 = `페이로드(payload)`
 - 표현은 요청이나 응답에서 전달할 실제 데이터
 - 표현 헤더는 표현 데이터를 해석할 수 있는 정보 제공
    - 데이터 유형(html, json), 데이터 길이, 압축 정보 등등
 - 참고: 표현 헤더는 표현 메타데이터와, 페이로드 메시지를 구분해야하지만 복잡
+
 ## 표현(Representation)
 - Content-Type: 표현 데이터의 형식
 - Content-Encoding: 표현 데이터의 압축 방식
 - Content-Language: 표현 데이터의 자연 언어
 - Content-Length: 표현 데이터의 길이(byte 단위)
-
 - 표현 헤더는 전송, 응답 모두 사용함
+
+> 리소스를 클라이언트와 서버가 주고 받을 때는 서로 이해할 수 있는 형식으로 변환해서 주고 받아야한다. 따라서 리소스를 `JSON, xml, html 등`으로 표현한다는 의미로 사용한다.
+
 ### Content-Type
 - 표현 데이터의 형식 설명
-- 미디어 타아비, 문자 인코딩
+- 미디어 타입, 문자 인코딩
 - 예
   - text/html; charset=utf-8
   - application/json
@@ -700,11 +708,11 @@ Content-Type: application/json
   - gzip
 
 ### Content-Language
-- 표현 데이터의 자연 언어를 표현
+- 표현 데이터의 언어를 표현
 - 예)
-  - ko
-  - en
-  - en-US
+  - ko(한국어)
+  - en(영어)
+  - en-US(영국 영어)
 
 ## 콘텐츠 협상-클라이언트가 선호하는 표현 요청
 - Accept: 클라이언트가 선호하는 미디어 타입 전달
@@ -715,16 +723,23 @@ Content-Type: application/json
   - 만약 요청한 언어를 서버에서 지원을 하지 않는다면?
 
 - 협상 헤더는 요청시에만 사용
+- 서버는 해당 헤더를 참고해서 우선순위에 맞춰 데이터를 찾아보고 응답
 
 ### 협상과 우선순위1
 - Quality Value(q) 값 사용
 - 0~1, 클수록 높은 우선순위
 - 생략하면 1
 - Accept-Language: ko_KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
-- 요청한 언어를 지원하지 않는 서버를 대비해서 우선순위를 서버에 전달
+- 요청한 언어를 지원하지 않는 서버를 대비해서 다양한 언어에 우선순위를 부여하고 서버에 전달
+
 ### 협상과 우선순위2
-- 구체적인 데이터가 우선
+- 구체적인 데이터가 높은 우선순위를 갖는다.
 - Accept: text/*, text/plain, text/plain;format=flowed, */*
+  - 1. text/plain;format=flowed
+  - 2. text/plain
+  - 3. text/*
+  - 4. \*/*
+
 ### 협상과 우선순위3
 - 구체적인 것을 기준으로 미디어 타입을 맞춘다.
 - Accept: text/*;q=0.3, text/plain;q=0.7, text/plain;format=flowed;q=0.5
@@ -740,6 +755,7 @@ Content-Type: application/json
   - Content-Length를 넣으면 안된다. 예상할 수 없기 때문
 - 범위 전송
   - 클라이언트가 전송받을 범위를 서버에 전송, Content-Range에 시작 byte, 끝 byte를 포함하여 응답
+
 ## 일반 정보
 - From: 유저 에이전트의 이메일 정보
   - 일반적으로 잘 사용되지 않음
